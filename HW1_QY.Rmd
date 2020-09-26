@@ -1,0 +1,190 @@
+---
+title: "Draft"
+author: "Qiana Yang"
+date: "9/22/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+2.8: For the tall and short fathers considered in the example, calculate their sons' heights assuming r = 0.25 and r = 0.75.
+
+```{r}
+
+eq1 = function(x) {x + 1}
+eq2 = function(x) {0.25 * (x - 68) + 69}
+eq3 = function(x) {0.75 * (x - 68) + 69}
+
+x <- data.frame("father_height" = c(64, 72))
+x$son_height_control <- eq1(x$father_height)
+x$son_height_r25 <- eq2(x$father_height)
+x$son_height_r75 <- eq3(x$father_height)
+x
+
+# when r is closer to 0, the predicted heights of sons are farther away from the y = x + 1 model. Conversely, when r is closer to 1, the predicted heights of sons are closer to the y = x + 1 model.
+
+```
+
+2.9(1) Create scatter plots for S&P500 vs. IBM and S&P500 vs. Apple.
+
+```{r}
+
+# read file
+stocks <- read.csv(here::here('IBM-Apple-SP500 RR Data.csv'), skip = 1)[, 1:4]
+
+colnames(stocks) <- c("Date", "SP", "IBM", "Apple")
+
+# examine file
+summary(stocks)
+head(stocks)
+
+# find and replace '%'. Set each column 2-4 as numeric.
+stocks[, 2:4] <- lapply(stocks[, 2:4], function(x) as.numeric(gsub("%", "", x)))
+
+# create scatter plots
+plot_Apple <- plot(stocks$SP, stocks$Apple, xlab = "Return Rates of S&P500 (in percent)", ylab = "Return Rates of Apple (in percent)")
+
+plot_IBM <- plot(stocks$SP, stocks$IBM, xlab = "Return Rates of S&P500 (in percent)", ylab = "Return Rates of IBM (in percent)")
+
+## Both scatter plots present positive correlation between the return rates of S&P500 and those of Apple and IBM. Overall, Apple was more sensitive to the S&P rates than IBM - the slope of the LS line for Apple VS. S&P has a greater magnitude.
+
+```
+
+2.9(2) Calculate the slopes of the LS lines for IBM and Apple with reference to S&P 500. Comment on the relative magnitudes of the slopes. Which stock had a higher expected return relative to S&P 500?
+
+```{r}
+# create LS lines for the two plots.
+
+line_IBM <- lm(IBM ~ SP, stocks)
+coef(line_IBM)
+# slope for the IBM vs. SP line is 0.74.
+
+line_Apple <- lm(Apple ~ SP, stocks)
+coef(line_Apple)
+# slope for the Apple vs. SP line is 1.24.
+
+# the slope of Apple vs. S&P500 has a greater magnitude. Apple has a higher expected return relative to S&P500.
+
+```
+
+2.9(3) Calculate the sample standard deviations of the rates of return for S&P 500, IBM and Apple. Also calculate the correlation matrix. Check that beta = r * sd(y) / sd(x) for each stock.
+
+```{r}
+# standard deviations
+sd_SP <- sd(stocks$SP)
+sd_IBM <- sd(stocks$IBM)
+sd_Apple <- sd(stocks$Apple)
+
+# correlation matrix
+cor(stocks[, 2:4])
+
+# check beta = r * sd(y) / sd(x)
+cor(stocks$SP, stocks$Apple) * sd_Apple / sd_SP
+coef(line_Apple)['SP']
+
+cor(stocks$SP, stocks$IBM) * sd_IBM / sd_SP 
+coef(line_IBM)['SP']
+
+```
+
+2.9(4)Explain based on the statistics calculated how a higher expected return is accompanied by higher volatility of the Apple stock.
+
+```{r}
+
+summary(line_Apple)
+summary(line_IBM)
+
+# Note that the standard error of the residuals of the Apple plot almost doubles that of IBM's, meaning that Apple's return rates demonstrate greater degrees of variability. Therefore, a higher expected return is accompanies by higher volatility of the Apple stock.
+
+```
+
+2.10(1) Estimate the price elasticities of all three steaks. Given that chuck is the least expensive cut and porter house is the most expensive cut of beef among these three cuts, are their price elasticities in the expected order?
+
+```{r}
+
+# read file
+steakprices <- read.csv(here::here("steakprices.CSV"))
+summary(steakprices)
+head(steakprices)
+
+# clean file
+steakprices[, c("Chuck.Price", "PortHse.Price", "RibEye.Price")] <- lapply(steakprices[, c("Chuck.Price", "PortHse.Price", "RibEye.Price")], function(x) as.numeric(gsub("\\$", "", x)))
+
+head(steakprices)
+
+# plot price-quantity relationships
+plot_chuck <- plot(steakprices$Chuck.Qty, steakprices$Chuck.Price)
+plot_porthse <- plot(steakprices$PortHse.Qty, steakprices$PortHse.Price)
+plot_ribeye <- plot(steakprices$RibEye.Qty, steakprices$RibEye.Price)
+
+# find LS lines
+line_chuck <- lm(Chuck.Price ~ Chuck.Qty, steakprices)
+line_porthse <- lm(PortHse.Price ~ PortHse.Qty, steakprices)
+line_ribeye <- lm(RibEye.Price ~ RibEye.Qty, steakprices)
+
+# plot LS lines
+plot(line_chuck)
+plot(line_porthse)
+plot(line_ribeye)
+
+# estimate price elasticities
+pe_chuck <- abs((1 / coef(line_chuck)[['Chuck.Qty']]) * mean(steakprices$Chuck.Price) / mean(steakprices$Chuck.Qty))
+
+pe_porthse <- abs((1 / coef(line_porthse)[['PortHse.Qty']]) * mean(steakprices$PortHse.Price) / mean(steakprices$PortHse.Qty))
+
+pe_ribeye <- abs((1 / coef(line_ribeye)[['RibEye.Qty']]) * mean(steakprices$RibEye.Price) / mean(steakprices$RibEye.Qty))
+
+pe_chuck
+pe_porthse
+pe_ribeye
+
+# Their price elasticities are not in expected order - we would expect the most expensive cut to be the most inelastic in terms of demand and vice versa, but here we have ribeye to have the greatest price elasticity rather than chuck. 
+
+```
+
+2.10(2) Estimate how much the demand will change if the price is increased by 10% for each cut.
+
+```{r}
+
+demand_chuck <- -0.1 * pe_chuck * mean(steakprices$Chuck.Qty) / mean(steakprices$Chuck.Price)
+
+demand_porthse <- -0.1 * pe_porthse * mean(steakprices$PortHse.Qty) / mean(steakprices$PortHse.Price)
+
+demand_ribeye <- -0.1 * pe_ribeye * mean(steakprices$RibEye.Qty) / mean(steakprices$RibEye.Price)
+
+demand_chuck
+demand_porthse
+demand_ribeye
+
+```
+
+2.11(1) Make scatter plots of the number of deaths due to each type of cancer versus cigarettes smoked to see what types of relationships (linear, nonlinear) exist and if there are any outliers.
+
+```{r}
+# read file
+cancer <- read.csv(here::here("Cancer Data.csv"))
+summary(cancer)
+head(cancer)
+
+# plot data
+plot_bladder <- plot(cancer$CIG.SMOKED, cancer$BLADDER)
+plot_lung <- plot(cancer$CIG.SMOKED, cancer$LUNG)
+plot_kidney <- plot(cancer$CIG.SMOKED, cancer$KIDNEY)
+plot_leukemia <- plot(cancer$CIG.SMOKED, cancer$LEUKEMIA)
+
+# outliers: (all plot points are appoximates): (22, 25), (28, 16), and (44,23) in plot_lung; (30, 4.5) in plot_kidney; (30, 1) in plot_leukemia.
+
+# linear relationship appears to exist in plot_bladder and plot_lung, but it's not apparent in the other two plots. It may also be the case that logarithmic relationships exist in plot_bladder, plot_lung, and plot_kidney.
+
+```
+2.11(2) Perform tests on the correlations to see which type of cancer deaths are most significantly correlated with cigarette smoking.
+
+```{r}
+
+cor(cancer["CIG.SMOKED"], cancer[3:6])
+
+# Bladder and lung cancers are most significantly correlated with cigarette smoking.
+```
+
