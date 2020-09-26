@@ -89,19 +89,23 @@ plot(RR_data$S.P.500, RR_data$Apple, xlab = "Rate of Return of S&P 500", ylab = 
 ```{r}
 apple_sp500 <- lm(Apple ~ S.P.500, data = RR_data)
 ibm_sp500 <- lm(IBM ~ S.P.500, data = RR_data)
-coef(ibm_sp500)
-coef(apple_sp500)
+ibm_beta <- as.numeric(coef(ibm_sp500)[2])
+apple_beta <- as.numeric(coef(apple_sp500)[2])
+c("Beta of IBM" = ibm_beta, "Beta of Apple" = apple_beta)
 ```
 
 
+##### c.
 ```{r}
 sd_sp500 <- sd(RR_data$S.P.500)
 sd_ibm <- sd(RR_data$IBM)
 sd_apple <- sd(RR_data$Apple)
 r_ibm <- cor(RR_data$S.P.500, RR_data$IBM)
 r_apple <- cor(RR_data$S.P.500, RR_data$Apple)
-r_ibm*sd_ibm/sd_sp500
-r_apple*sd_apple/sd_sp500
+cor(RR_data[2:4])
+ibm_beta_c <- r_ibm*sd_ibm/sd_sp500
+apple_beta_c <- r_apple*sd_apple/sd_sp500
+c("Beta of IBM" = ibm_beta_c, "Beta of Apple" = apple_beta_c)
 ```
 
 
@@ -115,9 +119,47 @@ steakprices$PortHse.Price <- as.numeric(gsub("\\$", "", steakprices$PortHse.Pric
 steakprices$RibEye.Price <- as.numeric(gsub("\\$", "", steakprices$RibEye.Price ))
 ```
 
+##### a.
 ```{r}
-lm(Chuck.Qty ~ Chuck.Price, data = steakprices)
-lm(PortHse.Qty ~ PortHse.Price, data = steakprices)
-lm(RibEye.Qty ~ RibEye.Price, data = steakprices)
+chuck <- lm(log(Chuck.Qty) ~ log(Chuck.Price), data = steakprices)
+chuck_pe <- as.numeric(coef(chuck)[2])
+porthse_pe <- as.numeric(coef(lm(log(PortHse.Qty) ~ log(PortHse.Price), data = steakprices))[2])
+ribeye_pe <- as.numeric(coef(lm(log(RibEye.Qty) ~ log(RibEye.Price), data = steakprices))[2])
+pe = c("Chuck" = chuck_pe, "Porter House" = porthse_pe, "Rib Eye" = ribeye_pe)
+pe
+```
+Yes, their price elasticities are in the expexted order, with the most expensive Porter House having the greatest price elasticity and the cheapest Chuck has the smallest price elasticity.
+
+##### b.
+```{r}
+(1-1.1^(pe))*100
+```
+With 10% increase in price, the demand of Chuck will decrease by 12.23%, the demand of Porter House will decrease by 22.37%, and the demand of Rib Eye will decrease by 12.87%. 
+
+
+#### 2.11
+```{r}
+cancer <- read.csv("Cancer Data.csv")
 ```
 
+##### a.
+```{r}
+par(mfrow = c(2,2))
+plot(cancer$CIG.SMOKED, cancer$BLADDER, xlab = "Cigarettes Smoked", ylab = "Number of Deatths due to Bladder Cancer")
+plot(cancer$CIG.SMOKED, cancer$LUNG, xlab = "Cigarettes Smoked", ylab = "Number of Deatths due to Lung Cancer")
+plot(cancer$CIG.SMOKED, cancer$KIDNEY, xlab = "Cigarettes Smoked", ylab = "Number of Deatths due to Kidney Cancer")
+plot(cancer$CIG.SMOKED, cancer$LEUKEMIA, xlab = "Cigarettes Smoked", ylab = "Number of Deatths due to Leukemia")
+```
+
+##### b.
+```{r}
+#Correlation Matrix
+cor(cancer[-1])
+r <- cor(cancer[-1])[1, -1]
+#t-test statistics
+t_stat = r*sqrt(nrow(cancer)-2)/sqrt(1-r^2)
+t_stat
+#p(>|t|)
+pt(t_stat, nrow(cancer)-2, lower.tail = FALSE)*2
+```
+Based on the t-test, bladder cancer, lung cancer and kidney cancer are all significantly correlated with cigarette smoking. Leukemia is not significantly correlated with cigarette smoking. 
