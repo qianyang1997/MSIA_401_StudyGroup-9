@@ -1,0 +1,183 @@
+---
+title: "hw1-Dian-Yu"
+author: "Dian Yu"
+date: "9/26/2020"
+output:
+  pdf_document: default
+  html_document: default
+params:
+    answers: TRUE
+---
+
+
+```{r, echo=FALSE, eval=TRUE}
+answers<-params$answers
+```
+
+```{r global_options, echo = FALSE, include = FALSE}
+knitr::opts_chunk$set(echo=answers, eval=answers,
+                      warning = FALSE, message = FALSE,
+                      cache = FALSE, tidy = FALSE)
+```
+
+```{r}
+library(tidyverse)
+```
+
+## 2.9 Beta coefficients of stocks
+
+### a)
+
+```{r, fig.width = 6, fig.height = 4}
+stocks <- read.csv("IBM-Apple-SP500 RR Data.csv", skip = 1, stringsAsFactors = FALSE)
+
+
+#' Convert a string to a float by removing the percentage sign at the end of the string.
+#' 
+#' @param str A string with a percentage sign at the end.
+#' 
+#' @return A number converted from the string with the percentage sign removed.
+#' 
+rm_percentage_sign <- function(str) {
+    num <- as.numeric(substr(str, 1, nchar(str) - 1))
+    return(num)
+}
+
+
+stocks <- stocks %>%
+    select(1:4) %>%
+    mutate(S.P.500 = rm_percentage_sign(S.P.500), 
+           IBM = rm_percentage_sign(IBM), 
+           Apple = rm_percentage_sign(Apple))
+
+ggplot(data = stocks, mapping = aes(x = S.P.500, y = IBM)) + 
+    geom_point(color = "deepskyblue3")
+
+ggplot(data = stocks, mapping = aes(x = S.P.500, y = Apple)) + 
+    geom_point(color = "deepskyblue3")
+```
+
+The individual stocks appear to be linearly correlated with the S&P 500 index.
+
+### b)
+
+```{r}
+ibm_fit = lm(IBM~S.P.500, data = stocks)
+summary(ibm_fit)
+apple_fit = lm(Apple~S.P.500, data = stocks)
+summary(apple_fit)
+```
+
+The beta for IBM with reference to S&P 500 is 0.74, and the beta for Apple is 1.24. Thus, Apple had a higher expected return relative to S&P 500. When S&P 500 had a return of 1%, the Apple stock had an expected return of 1.24%.
+
+### c)
+
+```{r}
+S.P.500_sd = sd(stocks$S.P.500)
+ibm_sd = sd(stocks$IBM)
+apple_sd = sd(stocks$Apple)
+cor(stocks[,2:4])
+ibm_beta = cor(stocks$IBM, stocks$S.P.500) * (ibm_sd / S.P.500_sd)
+ibm_beta
+apple_beta = cor(stocks$Apple, stocks$S.P.500) * (apple_sd / S.P.500_sd)
+apple_beta
+```
+
+### d)
+
+Given the same level of correlation r, the higher is the sample SD (i.e. volatility) of the individual stock, the higher is the beta coefficient. In fact, the sample SD or volatility of a stock is usually a great way to represent the risk. Finance 101 tells us that higher risk is often associated with higher expected return.
+
+## 2.10 Price elasticities of steaks
+
+### a)
+
+```{r}
+steak <- read.csv("steakprices.csv", stringsAsFactors = FALSE)
+
+
+#' Convert a string to a float by removing the dollar sign in front of the string.
+#' 
+#' @param str A string with a dollar sign in front.
+#' 
+#' @return A number converted from the string with the dollar sign removed.
+#' 
+rm_dollar_sign <- function(str) {
+    num <- as.numeric(substr(str, 2, nchar(str)))
+    return(num)
+}
+
+
+steak <- steak %>%
+    # Remove dollar signs in the price columns
+    mutate(Chuck.Price = rm_dollar_sign(Chuck.Price), 
+           PortHse.Price = rm_dollar_sign(PortHse.Price), 
+           RibEye.Price = rm_dollar_sign(RibEye.Price)) %>%
+    # Log-transformations
+    mutate(log_chuck_qty = log(Chuck.Qty), 
+           log_chuck_price = log(Chuck.Price), 
+           log_porterhouse_qty = log(PortHse.Qty), 
+           log_porterhouse_price = log(PortHse.Price), 
+           log_ribeye_qty = log(RibEye.Qty),
+           log_ribeye_price = log(RibEye.Price))
+
+chuck_fit = lm(log_chuck_qty~log_chuck_price, data = steak)
+summary(chuck_fit)
+ribeye_fit = lm(log_ribeye_qty~log_ribeye_price, data = steak)
+summary(ribeye_fit)
+porterhouse_fit = lm(log_porterhouse_qty~log_porterhouse_price, data = steak)
+summary(porterhouse_fit)
+```
+
+The price elasticities of chuck, rib eye, and porter house are respectively -1.37, -1.45, and -2.66. Thus, the order of the elasticities is indeed the same as the order of expensiveness. 
+
+### b)
+
+```{r}
+summary(chuck_fit)$coefficients[2, 1] * 10
+summary(ribeye_fit)$coefficients[2, 1] * 10
+summary(porterhouse_fit)$coefficients[2, 1] * 10
+```
+
+The estimated demand change for chuck, rib eye, and porter house are respectively -13.69%, -14.46%, and -26.56%.
+
+## 2.11 Smoking versus cancer
+
+### a)
+
+```{r, fig.width = 6, fig.height = 4}
+smoking_cancer <- read.csv("Cancer Data.csv", stringsAsFactors = FALSE)
+
+ggplot(data = smoking_cancer, mapping = aes(x = CIG.SMOKED, y = BLADDER)) + 
+    geom_point(color = "deepskyblue3")
+
+ggplot(data = smoking_cancer, mapping = aes(x = CIG.SMOKED, y = LUNG)) + 
+    geom_point(color = "deepskyblue3")
+
+ggplot(data = smoking_cancer, mapping = aes(x = CIG.SMOKED, y = KIDNEY)) + 
+    geom_point(color = "deepskyblue3")
+
+ggplot(data = smoking_cancer, mapping = aes(x = CIG.SMOKED, y = LEUKEMIA)) + 
+    geom_point(color = "deepskyblue3")
+
+smoking_cancer[smoking_cancer$CIG.SMOKED > 40,]
+```
+
+DC and NE has especially high number of cigarettes smoked. When these two observations are removed, the number of deaths due to bladder, lung, and kidney cancer all appear to be linearly correlated with cigarettes smoked. However, the correlation between the number of deaths due to leukemia and cigarettes smoked seems weak.
+
+### b)
+
+```{r}
+# Notice that to test the correlation coefficient = 0 is the same as testing the regression coefficient beta = 0.
+bladder_fit = lm(BLADDER~CIG.SMOKED, data = smoking_cancer)
+summary(bladder_fit)
+lung_fit = lm(LUNG~CIG.SMOKED, data = smoking_cancer)
+summary(lung_fit)
+kidney_fit = lm(KIDNEY~CIG.SMOKED, data = smoking_cancer)
+summary(kidney_fit)
+leukemia_fit = lm(LEUKEMIA~CIG.SMOKED, data = smoking_cancer)
+summary(leukemia_fit)
+
+cor(smoking_cancer[2:6])[1, 2:5]
+```
+
+The correlation between bladder, lung, and kidney cancer deaths and cigarette smoking are all significantly different from 0, but the correlation between leukemia and cigarette smoking is not statistically significant. Among bladder, lung, and kidney cancers, bladder cancer is most significantly correlated with cigarette smoking, with a t value of 6.417 and a correlation coefficient of 0.704.
