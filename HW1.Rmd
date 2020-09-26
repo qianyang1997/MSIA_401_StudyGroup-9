@@ -1,0 +1,123 @@
+---
+title: "MSIA 401 HW1"
+author: "Yijun Wu"
+date: "9/21/2020"
+output: html_document
+---
+
+#### 2.1
+
+Set $\frac{\partial Q}{\partial \beta}=0$ to minimize Q and then get the expression for $\beta$:
+$$\begin{equation}
+  \begin{split}
+  Q 
+  &= \sum^n_{i=1}(y_i-\hat\beta x_i)^2 \\
+  \frac{\partial Q}{\partial \beta}
+  &=  \sum^n_{i=1}2(-x_i)(y_i-\hat\beta x_i) =0\\
+  0
+  &= -2\sum^n_{i=1}(x_iy_i-\hat\beta {x_i}^2) \\
+  \hat\beta \sum^n_{i=1} {x_i}^2 
+  &= \sum^n_{i=1}x_iy_i \\
+  \hat\beta
+  &= \frac{\sum^n_{i=1}x_iy_i}{\sum^n_{i=1} {x_i}^2 }
+  \end{split}
+\end{equation}$$
+
+#### 2.3
+Set $\frac{\partial Q}{\partial \beta}=0$ to minimize Q and then get the expression for $\beta$:
+$$\begin{equation}
+  \begin{split}
+  Q 
+  &= \sum^n_{i=1}w_i(y_i-\hat\beta x_i)^2 \\
+  Q
+  &= \sum^n_{i=1}w_i(y_i^2-2\hat\beta x_i y_i+{\hat\beta}^2{x_i}^2)\\
+  \frac{\partial Q}{\partial \beta}
+  &=  \sum^n_{i=1}w_i(-2x_i y_i+2\hat\beta{x_i}^2) =0\\
+  \hat\beta \sum^n_{i=1} w_i {x_i}^2
+  &= \sum^n_{i=1}w_i x_i y_i \\
+  \hat\beta
+  &= \frac{\sum^n_{i=1}w_i x_iy_i}{\sum^n_{i=1} w_i {x_i}^2 }
+  \end{split}
+\end{equation}$$
+
+
+#### 2.8
+```{r}
+father_s <- 64
+father_t <- 72
+sx <- 2.7
+sy <- 2.7
+father_bar <- 68
+son_bar <- 69
+r1 <- 0.25
+r2 <- 0.75
+```
+
+```{r}
+# when r = 0.25
+son_s_1 <- r1*(sx/sy)*(father_s-father_bar)+son_bar 
+son_t_1 <- r1*(sx/sy)*(father_t-father_bar)+son_bar 
+#when r = 0.75
+son_s_2 <- r2*(sx/sy)*(father_s-father_bar)+son_bar 
+son_t_2 <- r2*(sx/sy)*(father_t-father_bar)+son_bar 
+```
+
+```{r}
+#result
+table <- data.frame("Father shorter"= c(son_s_1, son_s_2), "Father taller" = c(son_t_1, son_t_2))
+row.names(table) <- c("r=.25", "r=.75")
+table
+```
+
+#### 2.9
+
+```{r}
+RR_data <- read.csv("IBM-Apple-SP500 RR Data.csv", header = TRUE, skip = 1)
+RR_data$S.P.500 <- as.numeric(gsub("\\%", "", RR_data$S.P.500 ))
+RR_data$IBM <- as.numeric(gsub("\\%", "", RR_data$IBM ))
+RR_data$Apple <- as.numeric(gsub("\\%", "", RR_data$Apple ))
+```
+
+##### a.
+```{r}
+par(mfrow = c(1,2))
+plot(RR_data$S.P.500, RR_data$IBM, xlab = "Rate of Return of S&P 500", ylab = "Rate of Return on IBM", main = "IBM vs S&P 500", ylim = c(-35, 30))
+plot(RR_data$S.P.500, RR_data$Apple, xlab = "Rate of Return of S&P 500", ylab = "Rate of Return on Apple", main = "Applevs S&P 500" , ylim = c(-35, 30))
+```
+
+##### b.
+```{r}
+apple_sp500 <- lm(Apple ~ S.P.500, data = RR_data)
+ibm_sp500 <- lm(IBM ~ S.P.500, data = RR_data)
+coef(ibm_sp500)
+coef(apple_sp500)
+```
+
+
+```{r}
+sd_sp500 <- sd(RR_data$S.P.500)
+sd_ibm <- sd(RR_data$IBM)
+sd_apple <- sd(RR_data$Apple)
+r_ibm <- cor(RR_data$S.P.500, RR_data$IBM)
+r_apple <- cor(RR_data$S.P.500, RR_data$Apple)
+r_ibm*sd_ibm/sd_sp500
+r_apple*sd_apple/sd_sp500
+```
+
+
+
+
+#### 2.10
+```{r}
+steakprices <- read.csv("steakprices.CSV")
+steakprices$Chuck.Price <- as.numeric(gsub("\\$", "", steakprices$Chuck.Price ))
+steakprices$PortHse.Price <- as.numeric(gsub("\\$", "", steakprices$PortHse.Price ))
+steakprices$RibEye.Price <- as.numeric(gsub("\\$", "", steakprices$RibEye.Price ))
+```
+
+```{r}
+lm(Chuck.Qty ~ Chuck.Price, data = steakprices)
+lm(PortHse.Qty ~ PortHse.Price, data = steakprices)
+lm(RibEye.Qty ~ RibEye.Price, data = steakprices)
+```
+
