@@ -162,7 +162,7 @@ demand_ribeye
 
 ```{r}
 # read file
-cancer <- read.csv(here::here("Cancer Data.csv"))
+cancer <- read.csv("Cancer Data.csv")
 summary(cancer)
 head(cancer)
 
@@ -182,7 +182,11 @@ lapply(cancer[, 3:6], function(x) summary(lm(x~cancer$CIG.SMOKED)))
 ```{r}
 
 cor(cancer["CIG.SMOKED"], cancer[3:6])
+cor.test(cancer[["CIG.SMOKED"]], cancer[[3]])
+cor.test(cancer[["CIG.SMOKED"]], cancer[[4]])
+cor.test(cancer[["CIG.SMOKED"]], cancer[[5]])
+cor.test(cancer[["CIG.SMOKED"]], cancer[[6]])
 
-# Bladder and lung cancers are most significantly correlated with cigarette smoking.
+# Bladder and lung cancers are most significantly correlated with cigarette smoking, with both correlation coefficients around 0.7 and p-values significantly lower than 0.05. Kidney cancer is mildly correlated with cigarette smoking, with r = 0.49 and p-value < 0.05. In the case of leukemia cancer, we fail to reject the null hypothesis that there is no correlation between leukemia cancer and cigarette smoking.
 ```
 
