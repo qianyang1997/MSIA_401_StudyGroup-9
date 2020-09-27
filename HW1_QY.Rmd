@@ -65,6 +65,8 @@ line_Apple <- lm(Apple ~ SP, stocks)
 coef(line_Apple)
 # slope for the Apple vs. SP line is 1.24.
 
+predict(line_IBM, data.frame(SP = c(1,2,3)), interval = "prediction")
+
 # the slope of Apple vs. S&P500 has a greater magnitude. Apple has a higher expected return relative to S&P500.
 
 ```
@@ -119,28 +121,22 @@ plot_chuck <- plot(steakprices$Chuck.Qty, steakprices$Chuck.Price)
 plot_porthse <- plot(steakprices$PortHse.Qty, steakprices$PortHse.Price)
 plot_ribeye <- plot(steakprices$RibEye.Qty, steakprices$RibEye.Price)
 
-# find LS lines
-line_chuck <- lm(Chuck.Price ~ Chuck.Qty, steakprices)
-line_porthse <- lm(PortHse.Price ~ PortHse.Qty, steakprices)
-line_ribeye <- lm(RibEye.Price ~ RibEye.Qty, steakprices)
+# apply log transformation, find LS lines
+line_chuck <- lm(log(Chuck.Qty) ~ log(Chuck.Price), steakprices)
+line_porthse <- lm(log(PortHse.Qty) ~ log(PortHse.Price), steakprices)
+line_ribeye <- lm(log(RibEye.Qty) ~ log(RibEye.Price), steakprices)
 
 # plot LS lines
-plot(line_chuck)
-plot(line_porthse)
-plot(line_ribeye)
+summary(line_chuck)
+summary(line_porthse)
+summary(line_ribeye)
 
 # estimate price elasticities
-pe_chuck <- abs((1 / coef(line_chuck)[['Chuck.Qty']]) * mean(steakprices$Chuck.Price) / mean(steakprices$Chuck.Qty))
+pe_chuck <- coef(line_chuck)[2]
+pe_porthse <- coef(line_porthse)[2]
+pe_ribeye <- coef(line_ribeye)[2]
 
-pe_porthse <- abs((1 / coef(line_porthse)[['PortHse.Qty']]) * mean(steakprices$PortHse.Price) / mean(steakprices$PortHse.Qty))
-
-pe_ribeye <- abs((1 / coef(line_ribeye)[['RibEye.Qty']]) * mean(steakprices$RibEye.Price) / mean(steakprices$RibEye.Qty))
-
-pe_chuck
-pe_porthse
-pe_ribeye
-
-# Their price elasticities are not in expected order - we would expect the most expensive cut to be the most inelastic in terms of demand and vice versa, but here we have ribeye to have the greatest price elasticity rather than chuck. 
+# Their price elasticities are not in expected order - we would expect the most expensive cut to be the most inelastic in terms of demand and vice versa, but here we have chuck being relatively inelastic and porterhouse relatively more elastic. 
 
 ```
 
@@ -148,15 +144,17 @@ pe_ribeye
 
 ```{r}
 
-demand_chuck <- -0.1 * pe_chuck * mean(steakprices$Chuck.Qty) / mean(steakprices$Chuck.Price)
+demand_chuck <- 10 * pe_chuck
 
-demand_porthse <- -0.1 * pe_porthse * mean(steakprices$PortHse.Qty) / mean(steakprices$PortHse.Price)
+demand_porthse <- 10 * pe_porthse
 
-demand_ribeye <- -0.1 * pe_ribeye * mean(steakprices$RibEye.Qty) / mean(steakprices$RibEye.Price)
+demand_ribeye <- 10 * pe_ribeye
 
 demand_chuck
 demand_porthse
 demand_ribeye
+
+# Demand for chuck will drop by 13.7%. Demand for porter house will drop by 26.6%. Demand for ribeye will drop by 14.5%.
 
 ```
 
@@ -169,14 +167,14 @@ summary(cancer)
 head(cancer)
 
 # plot data
-plot_bladder <- plot(cancer$CIG.SMOKED, cancer$BLADDER)
-plot_lung <- plot(cancer$CIG.SMOKED, cancer$LUNG)
-plot_kidney <- plot(cancer$CIG.SMOKED, cancer$KIDNEY)
-plot_leukemia <- plot(cancer$CIG.SMOKED, cancer$LEUKEMIA)
 
-# outliers: (all plot points are appoximates): (22, 25), (28, 16), and (44,23) in plot_lung; (30, 4.5) in plot_kidney; (30, 1) in plot_leukemia.
+lapply(cancer[, 3:6], function(x) plot(lm(x~cancer$CIG.SMOKED)))
 
-# linear relationship appears to exist in plot_bladder and plot_lung, but it's not apparent in the other two plots. It may also be the case that logarithmic relationships exist in plot_bladder, plot_lung, and plot_kidney.
+lapply(cancer[, 3:6], function(x) summary(lm(x~cancer$CIG.SMOKED)))
+
+# outliers: rows 1, 27, and 42 in plot bladder; rows 16, 18, 33 in plot lung; rows 1, 2, 30 in plot kidney; rows 1, 21, 36 in plot leukemia.
+
+# looking at the R^2 values and residual plots, linear relationship appears to be stronger in plot_bladder and plot_lung, but it's not apparent in the other two plots. It could be the case that nonlinear relationships exist in all four plots.
 
 ```
 2.11(2) Perform tests on the correlations to see which type of cancer deaths are most significantly correlated with cigarette smoking.
