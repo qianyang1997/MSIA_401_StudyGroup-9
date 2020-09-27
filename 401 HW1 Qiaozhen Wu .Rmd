@@ -1,0 +1,125 @@
+---
+title: "401-HW1-Qiaozhen-Wu"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+
+# 2.9 
+### (a)Make scatter plots of rates of return of IBM versus S&P 500 and of Apple versus S&P 500 and comment on them.
+
+```{r}
+
+IASdata <-read.csv("~/Downloads/IBM-Apple-SP500 RR Data.csv", skip =1, stringsAsFactors = FALSE) #import data
+library(ggplot2)
+
+#remove percentage sign 
+IASdata$S.P.500 <- as.numeric(gsub("%","",IASdata$S.P.500))
+IASdata$Apple <- as.numeric(gsub("%","",IASdata$Apple))
+IASdata$IBM <- as.numeric(gsub("%","",IASdata$IBM))
+#plot 
+
+ggplot(IASdata, aes(x= S.P.500, y = IBM)) + geom_point(colour = "blue")
+ggplot(IASdata, aes(x= S.P.500, y = Apple)) + geom_point(colour = "blue")
+```
+### comment: Both of the Apple and IBM increases as S$P500 increases. 
+
+### (b)Calculate the β’s for IBM and Apple with reference to S&P 500. Comment on the relative magnitudes of the β’s. Which stock had a higher expected return relative to S&P 500?
+
+```{r}
+IBMr = lm(IBM ~ S.P.500, data = IASdata)
+summary(IBMr)
+Appler = lm(Apple ~ S.P.500 , data = IASdata)
+summary(Appler)
+
+```
+
+### comment: the beta for IBM against S&P500 is 0.745, and the bata for Apple against S&P500 is 1.245. Therefore, Apple has a higher return rate compared to IBM as S&P500 increases (it increases in 1.24 time as S&P500 increases by 1).(why is the lm in that order?)
+
+### (c)Calculate the sample standard deviations(SDs) of the rates of return for S&P500,IBM and Apple. Also calculate the correlation matrix. Check that β = rsy/sx for each stock where r is the correlation coefficient between S&P 500 and the given stock, sx is the sample SD of S&P 500 and sy is the sample SD of the given stock.
+
+``` {r}
+sd_Apple <- sd(IASdata$Apple)
+sd_S.P.500 <- sd(IASdata$S.P.500)
+sd_IBM <- sd(IASdata$IBM)
+matrix_data <- IASdata[, 2:4]
+cormat <- cor(matrix_data)
+
+bata_Apple = cormat[1,3] * (sd_Apple/sd_S.P.500)
+bata_IBM = cormat[1,2] * (sd_IBM/sd_S.P.500)
+
+summary(cormat)
+```
+
+### comment: after checking, beta for Apple and IBM equals to r*sy/sx
+
+### (d)Explain based on the statistics calculated how a higher expected return is accompanied by higher volatility of the Apple stock.
+
+### Answer: the bigger the standard deviation of Apple stock (i.e the sy in the beta equation), the higher the beta coefficient, which means the slope of the regression line will be bigger, thus return would be higher given the same increase in the Apple stock. 
+
+# 2.10
+
+### (a)Estimate the price elasticities of all three steaks. Given that chuck is the least expensive cut and porter house is the most expensive cut of beef among these three cuts, are their price elasticities in the expected order?
+
+```{r}
+steakprice <- read.csv("~/Downloads/steakprices.csv")
+
+#remove dollar sign in the front
+steakprice$Chuck.Price <- as.numeric(gsub("[\\$,]","",steakprice$Chuck.Price))
+steakprice$PortHse.Price <- as.numeric(gsub("[\\$,]","",steakprice$PortHse.Price ))
+steakprice$RibEye.Price <- as.numeric(gsub("[\\$,]","",steakprice$RibEye.Price ))
+
+#transform Qty and Price to lnx and lny 
+library(tidyverse)
+steakprices_log <- steakprice %>% mutate(log_Chuck.Qty = log(Chuck.Qty), log_Chuck.Price = log(Chuck.Price), log_PortHse.Qty = log(PortHse.Qty), log_PortHse.Price = log(PortHse.Price), log_RibEye.Qty = log(RibEye.Qty), log_RibEye.Price = log(RibEye.Price))
+
+#find price elasticity
+Chuck_lm = lm( log_Chuck.Qty ~ log_Chuck.Price , data = steakprices_log )
+summary(Chuck_lm)
+PortHse_lm = lm(log_PortHse.Qty ~ log_PortHse.Price , data = steakprices_log )
+summary(PortHse_lm)
+RibEye_lm = lm( log_RibEye.Qty ~ log_RibEye.Price, data = steakprices_log )
+summary(RibEye_lm)
+ggplot(steakprice, aes(x =Chuck.Qty, y = Chuck.Price)) + geom_point(color = "blue")
+```
+### comment: Price elacity for Chuck is -1.37 , for RibEye is -1.45, for PortHse is -1.66, therefore, since Chuck is the least expensive, it's price elacity is also the least - the order is the same as the price order 
+
+##(b) Estimate how much the demand will change if the price is increased by 10% for each cut.
+```{r}
+
+summary(Chuck_lm)$coefficient[2,1]*10
+summary(PortHse_lm)$coefficient[2,1]*10
+summary(RibEye_lm)$coefficient[2,1]*10
+
+```
+
+
+### comment: the demand for increase of Chuck, Porthouse, and ribeye prices are -13.68665%, -26.56487% and -14.46004%
+
+# 2.11 
+##  (a) Make scatter plots of the number of deaths due to each type of cancer versus cigarettes smoked to see what types of relationships (linear, nonlinear) exist and if there are any outliers.
+
+```{r}
+cancer_data <- read.csv("~/Downloads/Cancer Data.csv", stringsAsFactors = FALSE)
+
+ggplot(data = cancer_data, aes(x = CIG.SMOKED, y = BLADDER)) + geom_point(color = "blue")
+ggplot(data = cancer_data, aes(x = CIG.SMOKED, y = LUNG)) + geom_point(color = "blue")
+ggplot(data = cancer_data, aes(x = CIG.SMOKED, y = KIDNEY)) + geom_point(color = "blue")
+ggplot(data = cancer_data, aes(x = CIG.SMOKED, y = LEUKEMIA)) + geom_point(color = "blue")
+
+```
+### comment: it appears that BLADDER, KIDNEY AND lUNG all shows a linear correlation to ciggerate smoke, wihle Leukemia seems weak in the linear correlations.DC and NE appears to be outliers and have extreme high ciggerate smoked.
+
+## (b)Perform tests on the correlations to see which type of cancer deaths are most significantly correlated with cigarette smoking.
+
+```{r}
+
+cancer_rmoutlier <- cancer_data[cancer_data$CIG.SMOKED < 40 ,]
+cormat_cancer <- cor(cancer_rmoutlier[,2:6])
+#cormat_cancer <- cor(cancer_data[,2:6])
+summary(cormat_cancer)
+
+```
+### comment: it seems that lung cancer is most correlated with ciggerate smoke after removing the outliers of DC and NE.Lung, kidney and bladder all has dignificant correlation with smoking , while leukemia seems to not have such correlations. ( does outliers needs to be removed?) (what does stingasfactors do?)
+
