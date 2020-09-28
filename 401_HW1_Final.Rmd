@@ -1,6 +1,6 @@
 ---
 title: "MSiA 401 HW1"
-author: 'Group #9'
+author: 'Group #9: Qiana Yang, Qiaozhen Wu, Yijun Wu, Dian Yu'
 date: "9/27/2020"
 output: html_document
 ---
