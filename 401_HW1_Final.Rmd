@@ -1,0 +1,266 @@
+---
+title: "MSiA 401 HW1"
+author: 'Group #9'
+date: "9/27/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+#### 2.1
+
+Set $\frac{\partial Q}{\partial \beta}=0$ to minimize Q and then get the expression for $\beta$:
+$$\begin{equation}
+  \begin{split}
+  Q 
+  &= \sum^n_{i=1}(y_i-\hat\beta x_i)^2 \\
+  \frac{\partial Q}{\partial \beta}
+  &=  \sum^n_{i=1}2(-x_i)(y_i-\hat\beta x_i) =0\\
+  0
+  &= -2\sum^n_{i=1}(x_iy_i-\hat\beta {x_i}^2) \\
+  \hat\beta \sum^n_{i=1} {x_i}^2 
+  &= \sum^n_{i=1}x_iy_i \\
+  \hat\beta
+  &= \frac{\sum^n_{i=1}x_iy_i}{\sum^n_{i=1} {x_i}^2 }
+  \end{split}
+\end{equation}$$
+
+#### 2.3
+
+Set $\frac{\partial Q}{\partial \beta}=0$ to minimize Q and then get the expression for $\beta$:
+$$\begin{equation}
+  \begin{split}
+  Q 
+  &= \sum^n_{i=1}w_i(y_i-\hat\beta x_i)^2 \\
+  Q
+  &= \sum^n_{i=1}w_i(y_i^2-2\hat\beta x_i y_i+{\hat\beta}^2{x_i}^2)\\
+  \frac{\partial Q}{\partial \beta}
+  &=  \sum^n_{i=1}w_i(-2x_i y_i+2\hat\beta{x_i}^2) =0\\
+  \hat\beta \sum^n_{i=1} w_i {x_i}^2
+  &= \sum^n_{i=1}w_i x_i y_i \\
+  \hat\beta
+  &= \frac{\sum^n_{i=1}w_i x_iy_i}{\sum^n_{i=1} w_i {x_i}^2 }
+  \end{split}
+\end{equation}$$
+
+
+#### 2.8: For the tall and short fathers considered in the example, calculate their sons' heights assuming r = 0.25 and r = 0.75.
+
+```{r}
+father_s <- 64
+father_t <- 72
+sx <- 2.7
+sy <- 2.7
+father_bar <- 68
+son_bar <- 69
+r1 <- 0.25
+r2 <- 0.75
+```
+
+```{r}
+# when r = 0.25
+son_s_1 <- r1*(sx/sy)*(father_s-father_bar)+son_bar 
+son_t_1 <- r1*(sx/sy)*(father_t-father_bar)+son_bar 
+#when r = 0.75
+son_s_2 <- r2*(sx/sy)*(father_s-father_bar)+son_bar 
+son_t_2 <- r2*(sx/sy)*(father_t-father_bar)+son_bar 
+```
+
+```{r}
+#result
+table <- data.frame("Father shorter"= c(son_s_1, son_s_2), "Father taller" = c(son_t_1, son_t_2))
+row.names(table) <- c("r=.25", "r=.75")
+table
+
+# when r is closer to 0, the predicted heights of sons are farther away from the y = x + 1 model. Conversely, when r is closer to 1, the predicted heights of sons are closer to the y = x + 1 model.
+```
+
+
+#### 2.9(1) Create scatter plots for S&P500 vs. IBM and S&P500 vs. Apple.
+
+```{r}
+
+# read file
+stocks <- read.csv(here::here('IBM-Apple-SP500 RR Data.csv'), skip = 1)[, 1:4]
+
+colnames(stocks) <- c("Date", "SP", "IBM", "Apple")
+
+# examine file
+summary(stocks)
+head(stocks)
+
+# find and replace '%'. Set each column 2-4 as numeric.
+stocks[, 2:4] <- lapply(stocks[, 2:4], function(x) as.numeric(gsub("%", "", x)))
+
+# create scatter plots
+plot_Apple <- plot(stocks$SP, stocks$Apple, xlab = "Return Rates of S&P500 (in percent)", ylab = "Return Rates of Apple (in percent)")
+
+plot_IBM <- plot(stocks$SP, stocks$IBM, xlab = "Return Rates of S&P500 (in percent)", ylab = "Return Rates of IBM (in percent)")
+
+## Both scatter plots present positive correlation between the return rates of S&P500 and those of Apple and IBM. Overall, Apple was more sensitive to the S&P rates than IBM - the slope of the LS line for Apple VS. S&P has a greater magnitude.
+
+```
+
+#### 2.9(2) Calculate the slopes of the LS lines for IBM and Apple with reference to S&P 500. Comment on the relative magnitudes of the slopes. Which stock had a higher expected return relative to S&P 500?
+
+```{r}
+# create LS lines for the two plots.
+
+line_IBM <- lm(IBM ~ SP, stocks)
+coef(line_IBM)
+# slope for the IBM vs. SP line is 0.74.
+
+line_Apple <- lm(Apple ~ SP, stocks)
+coef(line_Apple)
+# slope for the Apple vs. SP line is 1.24.
+
+predict(line_IBM, data.frame(SP = c(1,2,3)), interval = "prediction")
+
+# the slope of Apple vs. S&P500 has a greater magnitude. Thus, Apple had a higher expected return relative to S&P 500. When S&P 500 had a return of 1%, the Apple stock had an expected return of 1.24%.
+
+```
+
+#### 2.9(3) Calculate the sample standard deviations of the rates of return for S&P 500, IBM and Apple. Also calculate the correlation matrix. Check that beta = r * sd(y) / sd(x) for each stock.
+
+```{r}
+# standard deviations
+sd_SP <- sd(stocks$SP)
+sd_IBM <- sd(stocks$IBM)
+sd_Apple <- sd(stocks$Apple)
+sd_SP
+sd_IBM
+sd_Apple
+# standard deviations for S&P500, IBM, and Apple are 4.45%, 5.56%, and 10.31% respectively.
+
+# correlation matrix
+cor(stocks[, 2:4])
+
+# check beta = r * sd(y) / sd(x)
+cor(stocks$SP, stocks$Apple) * sd_Apple / sd_SP
+coef(line_Apple)['SP']
+
+cor(stocks$SP, stocks$IBM) * sd_IBM / sd_SP 
+coef(line_IBM)['SP']
+
+```
+
+#### 2.9(4) Explain based on the statistics calculated how a higher expected return is accompanied by higher volatility of the Apple stock.
+
+```{r}
+
+summary(line_Apple)
+summary(line_IBM)
+
+# Note that the standard error of the residuals of the Apple plot almost doubles that of IBM's, meaning that Apple's return rates demonstrate greater degrees of variability. Therefore, a higher expected return is accompanies by higher volatility of the Apple stock.
+
+#Given the same level of correlation r, the higher is the sample SD (i.e. volatility) of the individual stock, the higher is the beta coefficient. In fact, the sample SD or volatility of a stock is usually a great way to represent risk. Finance 101 tells us that higher risk is often associated with higher expected return.
+
+```
+
+#### 2.10(1) Estimate the price elasticities of all three steaks. Given that chuck is the least expensive cut and porter house is the most expensive cut of beef among these three cuts, are their price elasticities in the expected order?
+
+```{r}
+
+# read file
+steakprices <- read.csv(here::here("steakprices.CSV"))
+summary(steakprices)
+head(steakprices)
+
+# clean file
+steakprices[, c("Chuck.Price", "PortHse.Price", "RibEye.Price")] <- lapply(steakprices[, c("Chuck.Price", "PortHse.Price", "RibEye.Price")], function(x) as.numeric(gsub("\\$", "", x)))
+
+head(steakprices)
+
+# plot price-quantity relationships
+plot_chuck <- plot(steakprices$Chuck.Qty, steakprices$Chuck.Price)
+plot_porthse <- plot(steakprices$PortHse.Qty, steakprices$PortHse.Price)
+plot_ribeye <- plot(steakprices$RibEye.Qty, steakprices$RibEye.Price)
+
+# apply log transformation, find LS lines
+line_chuck <- lm(log(Chuck.Qty) ~ log(Chuck.Price), steakprices)
+line_porthse <- lm(log(PortHse.Qty) ~ log(PortHse.Price), steakprices)
+line_ribeye <- lm(log(RibEye.Qty) ~ log(RibEye.Price), steakprices)
+
+# plot LS lines
+summary(line_chuck)
+summary(line_porthse)
+summary(line_ribeye)
+
+# estimate price elasticities
+pe_chuck <- coef(line_chuck)[2]
+pe_porthse <- coef(line_porthse)[2]
+pe_ribeye <- coef(line_ribeye)[2]
+
+# The price elasticities of chuck, rib eye, and porter house are -1.37, -1.45, and -2.66 respectively. Thus, the order of the elasticities is indeed the same as the order of expensiveness. We would expect the most expensive cut to be the most elastic and vice versa.
+
+```
+
+#### 2.10(2) Estimate how much the demand will change if the price is increased by 10% for each cut.
+
+```{r}
+
+demand_chuck <- 10 * pe_chuck
+
+demand_porthse <- 10 * pe_porthse
+
+demand_ribeye <- 10 * pe_ribeye
+
+demand_chuck
+demand_porthse
+demand_ribeye
+
+# Demand for chuck will drop by 13.7%. Demand for porter house will drop by 26.6%. Demand for ribeye will drop by 14.5%.
+
+```
+
+#### 2.11(1) Make scatter plots of the number of deaths due to each type of cancer versus cigarettes smoked to see what types of relationships (linear, nonlinear) exist and if there are any outliers.
+
+```{r}
+# read file
+cancer <- read.csv("Cancer Data.csv")
+summary(cancer)
+head(cancer)
+
+# plot data
+library(ggplot2)
+ggplot(data = cancer, mapping = aes(x = CIG.SMOKED, y = BLADDER)) +
+geom_point(color = "deepskyblue3")
+ggplot(data = cancer, mapping = aes(x = CIG.SMOKED, y = LUNG)) +
+geom_point(color = "deepskyblue3")
+ggplot(data = cancer, mapping = aes(x = CIG.SMOKED, y = KIDNEY)) +
+geom_point(color = "deepskyblue3")
+ggplot(data = cancer, mapping = aes(x = CIG.SMOKED, y = LEUKEMIA)) +
+geom_point(color = "deepskyblue3")
+
+# plot LS line data
+lapply(cancer[, 3:6], function(x) plot(lm(x~cancer$CIG.SMOKED)))
+
+lapply(cancer[, 3:6], function(x) summary(lm(x~cancer$CIG.SMOKED)))
+
+# identify outliers based on x-value
+cancer[cancer$CIG.SMOKED > 40,]
+# DC and NE has especially high number of cigarettes smoked. When these two observations are removed, the number of deaths due to bladder, lung, and kidney cancer all appear to be linearly correlated with cigarettes smoked. However, the correlation between the number of deaths due to leukemia and cigarettes smoked seems weak.
+
+# identify outliers based on residual plots
+# AK, NJ, and WI in plot bladder; LA, MD, PE in plot lung; AK, Al, ND in plot kidney; AK, MN, SD in plot leukemia.
+
+# looking at the R^2 values and residual plots, linear relationship appears to be stronger in plot_bladder and plot_lung, but it's not apparent in the other two plots. It could be the case that nonlinear(logarithmic) relationships exist in all four plots, if we have bigger x-values for reference.
+
+```
+
+#### 2.11(2) Perform tests on the correlations to see which type of cancer deaths are most significantly correlated with cigarette smoking.
+
+```{r}
+
+cor(cancer["CIG.SMOKED"], cancer[3:6])
+cor.test(cancer[["CIG.SMOKED"]], cancer[[3]])
+cor.test(cancer[["CIG.SMOKED"]], cancer[[4]])
+cor.test(cancer[["CIG.SMOKED"]], cancer[[5]])
+cor.test(cancer[["CIG.SMOKED"]], cancer[[6]])
+
+# The t values for the correlation between cigarettes smoked and bladder, lung, kidney, and leukemia cancers are 6.42, 6.31, 3.62, and -0.44 respectively.
+
+# Bladder and lung cancers are most significantly correlated with cigarette smoking, with both correlation coefficients around 0.7 and p-values significantly lower than 0.05. Kidney cancer is mildly correlated with cigarette smoking, with r = 0.49 and p-value < 0.05. In the case of leukemia cancer, we fail to reject the null hypothesis that there is no correlation between leukemia cancer and cigarette smoking.
+```
