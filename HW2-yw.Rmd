@@ -1,0 +1,162 @@
+---
+title: "HW2"
+author: "Yijun Wu"
+date: "9/28/2020"
+output: html_document
+---
+
+
+## 3.8 
+#### a.
+$$X = \begin{bmatrix} 1 &1\\ 1 & 2 \\1 & 3 \\ 1 & 4 \\ 1& 5\end{bmatrix}$$
+#### b.
+$$\begin{equation}
+\begin{split}
+X^{'}X 
+& = \begin{bmatrix} 1 & 1 & 1 & 1 & 1 \\ 1 & 2 & 3 & 4 & 5\end{bmatrix}
+\begin{bmatrix} 1 & 1\\ 1 & 2 \\1 & 3 \\ 1 & 4 \\ 1 & 5\end{bmatrix} \\
+& = \begin{bmatrix} 5 & 15 \\ 15 & 55 \end{bmatrix}
+\end{split}
+\end{equation}$$
+
+$$\begin{equation}
+\begin{split}
+(X^{'}X )^{-1}
+& = \frac{1}{5\times 55-15^2}\begin{bmatrix} 55 & -15 \\ -15 & 5 \end{bmatrix}\\
+& = \begin{bmatrix} 1.1 & -0.3 \\ -0.3 & 0.1 \end{bmatrix}
+\end{split}
+\end{equation}$$
+
+$$\begin{equation}
+\begin{split}
+\begin{bmatrix} 5 & 15 \\ 15 & 55 \end{bmatrix} \begin{bmatrix} 1.1 & -0.3 \\ -0.3 & 0.1 \end{bmatrix}
+& = \begin{bmatrix} (5)(1.1)+(15)(-0.3) & (5)(-0.3)+(15)(0.1) \\ (15)(1.1)+(55)(-0.3) & (15)(-0.3)+(55)(0.1) \end{bmatrix} \\
+& = \begin{bmatrix} 1 & 0 \\ 0 & 1 \end{bmatrix}
+\end{split}
+\end{equation}$$
+
+#### c.
+$$\begin{equation}
+\begin{split}
+X^{'}Y
+& = \begin{bmatrix} 1 & 1 & 1 & 1 & 1 \\ 1 & 2 & 3 & 4 & 5 \end{bmatrix} \begin{bmatrix} 2 \\ 6 \\ 7 \\ 9 \\ 10 \end{bmatrix} \\ 
+& = \begin{bmatrix} 34 \\ 121 \end{bmatrix}
+\end{split}
+\end{equation}$$
+
+#### d.
+$$\begin{equation}
+\begin{split}
+\begin{bmatrix} \hat\beta_0 \\ \hat\beta_1 \end{bmatrix}
+& = (X^{'}X)^{-1}XY \\
+& = \begin{bmatrix} 1.1 & -0.3 \\ -0.3 & 0.1 \end{bmatrix} \begin{bmatrix} 34 \\ 121 \end{bmatrix} \\
+& = \begin{bmatrix} 1.1 \\ 1.9 \end{bmatrix}
+\end{split}
+\end{equation}$$
+
+
+
+## 3.9 
+$\beta_0-\beta_1-\beta_2 +\beta_3= 40$
+$\beta_0+\beta_1-\beta_2 - \beta_3= 40+5$
+$\beta_0-\beta_1+\beta_2 - \beta_3= 40+10$
+$\beta_0+\beta_1+\beta_2 + \beta_3 = 65$
+$\beta_0 = 50, \beta_1 = 5, \beta_2 = 7.5, \beta_3 = 2.5$
+
+
+## 3.10
+```{r}
+cobb_douglas <- read.csv("Cobb-Douglas.csv")
+```
+
+#### a.
+```{r}
+cd_fit <- lm(log(output) ~ log(capital)+log(labor), data = cobb_douglas)
+summary(cd_fit)
+```
+
+#### b.
+```{r}
+beta1_hat <- coef(cd_fit)[2]
+beta2_hat <- coef(cd_fit)[3]
+var_beta1 <- vcov(cd_fit)[2,2]
+var_beta2 <- vcov(cd_fit)[3,3]
+cov_beta12 <- vcov(cd_fit)[2, 3]
+t_stat <- (beta1_hat+beta2_hat-1)/sqrt(var_beta1+var_beta2+2*cov_beta12)
+t_stat
+pt(t_stat, df = 566)*2
+```
+
+#### c.
+```{r}
+cb_fit_alt <- lm(I(log(cobb_douglas$output)-log(cobb_douglas$labor))~ I(log(cobb_douglas$capital)-log(cobb_douglas$labor)) + log(cobb_douglas$labor), data = cobb_douglas)
+summary(cb_fit_alt)
+```
+
+
+## 3.11
+
+#### a.
+```{r}
+research <- read.csv('Research.csv')
+library("PerformanceAnalytics")
+research$Research <- gsub("\\$" , "", research$Research)
+research$Research <- as.numeric(gsub("\\," , "", research$Research))
+chart.Correlation(research[,-1], histogram=TRUE, pch=19)
+cor(research[,-1])
+```
+
+#### b.
+```{r}
+research_fit <- lm(Research ~ Faculty + PhD, data = research)
+summary(research_fit)
+```
+
+
+## 3.12
+```{r}
+R <- rbind(c(1, 0.5), c(0.5, 1))
+r <- c(0.4, 0.8)
+beta_hat_star <- solve(R)%*%r
+#standardized regression coefficients
+beta_hat_star
+```
+
+```{r}
+beta_1 = beta_hat_star[1, 1]*5/2
+beta_2 = beta_hat_star[2, 1]*5/4
+beta_0 = 10-(beta_1*3+beta_2*5)
+beta_unstand <- c("beta_0" = beta_0, "beta_1" = beta_1, "beta_2" = beta_2)
+beta_unstand
+```
+
+
+## 3.14
+```{r}
+salaries <- read.csv("salaries.csv")
+salaries$Gender <- as.factor(salaries$Gender)
+salaries$Dept <- as.factor(salaries$Dept)
+```
+
+#### a.
+```{r}
+salaries$Gender <- relevel(salaries$Gender, "Male")
+salaries$Dept <- relevel(salaries$Dept, "Purchase")
+salary_fit <- lm(log10(Salary) ~ .-ID, data = salaries)
+summary(salary_fit)
+```
+
+#### b.
+```{r}
+salaries$Gender <- relevel(salaries$Gender, "Female")
+salaries$Dept <- relevel(salaries$Dept, "Purchase")
+salary_fit_1 <- lm(log10(Salary) ~ .-ID, data = salaries)
+summary(salary_fit_1)
+```
+
+#### c.
+```{r}
+data_n <- data.frame("YrsEm" = 8, "PriorYr" = 10, "Education" = 12, "ID" = 0, "Gender" = "Male", "Dept" = "Sales", "Super" = 5) 
+predict(salary_fit, newdata = data_n, interval = "prediction")
+```
+
