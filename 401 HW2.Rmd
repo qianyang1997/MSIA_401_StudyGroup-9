@@ -12,6 +12,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ## 3.8 
 #### a.
 $$X = \begin{bmatrix} 1 &1\\ 1 & 2 \\1 & 3 \\ 1 & 4 \\ 1& 5\end{bmatrix}$$
+
 #### b.
 $$\begin{equation}
 \begin{split}
@@ -60,10 +61,15 @@ $$\begin{equation}
 
 ## 3.9 
 $\beta_0-\beta_1-\beta_2 +\beta_3= 40$
+
 $\beta_0+\beta_1-\beta_2 - \beta_3= 40+5$
+
 $\beta_0-\beta_1+\beta_2 - \beta_3= 40+10$
+
 $\beta_0+\beta_1+\beta_2 + \beta_3 = 65$
+
 $\beta_0 = 50, \beta_1 = 5, \beta_2 = 7.5, \beta_3 = 2.5$
+
 Interpretation: $\beta_0$ could be considered as the mean salary between all combinations of demographics (white + male, non-white + male, white + female, non-white + female). The $\beta$s' in this regression model signify how much each demographic deviates from the mean when interaction is taken into account.
 
 
@@ -76,8 +82,8 @@ head(cd_data)
 
 cd_fit <- lm(log(output) ~ log(capital) + log(labor), cd_data)
 summary(cd_fit)
-
 ```
+
 #### b) test constant returns to scale
 
 ```{r}
@@ -162,10 +168,8 @@ beta_2 = beta_hat_star[2, 1]*5/4
 beta_0 = 10-(beta_1*3+beta_2*5)
 beta_unstand <- c("beta_0" = beta_0, "beta_1" = beta_1, "beta_2" = beta_2)
 beta_unstand
-
-# the regression model is, y = x_2 + 5
-
 ```
+The regression model is $y = x_2 + 5$
 
 ## 3.14
 #### a) Fit prediction model - set male and purchase as the reference variables
@@ -211,8 +215,8 @@ predict1 <- predict(salfit, newdata = data.frame(YrsEm = 8, PriorYr = 10, Educat
 
 #### d) The coefficient of Engg is highly nonsignificant with a P-value = 0.774 in the above regression. But if Sales is used as the reference category, the coefficient of Engg is highly significant with a P-value < 0:001. Interpret this result.
 
-#### Answer: the salaries of those from the Engineering Dept are not significantly different from those from the Purchase Dept, but they are significantly different from those from the Sales Dept.
+Answer: the salaries of those from the Engineering Dept are not significantly different from those from the Purchase Dept, but they are significantly different from those from the Sales Dept.
 
 #### e) In the above model, the coefficient of Female is nonsignificant with P = 0.115, so there is not a significant difference between the salaries of Males and Females, controlling for other variables. Should we drop Gender as a predictor variable? For Dept the question is more complicated since the coefficients of Advert and Engg are nonsignificant but the coefficient of Sales in highly significant with P = 0.0002. Should the nonsignificant categories, Advert and Engg, be pooled with the reference category, Purchase, or should the categories be left unpooled or should the Dept be dropped as a predictor variable?
 
-#### Answer: We may drop gender as a predictor variable because there is no significant difference between the two genders. Since the coefficient of Sales is significant, we should not pool the nonsignificant categories with the reference category, because otherwise we would lose information when changing reference categories. Dept should not be dropped as a predictor variable, because at least one of the dummy variables is significant.
+Answer: We may drop gender as a predictor variable because there is no significant difference between the two genders. Since the coefficient of Sales is significant, we should not pool the nonsignificant categories with the reference category, because otherwise we would lose information when changing reference categories. Dept should not be dropped as a predictor variable, because at least one of the dummy variables is significant.
