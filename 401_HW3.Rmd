@@ -1,0 +1,189 @@
+---
+title: "MSiA_401HW3"
+author: 'Group #9: Qiana Yang, Yijun Wu, Qiaozhen Wu, Dian Yu'
+date: "10/10/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(car)
+library(MASS)
+library(tidyverse)
+```
+
+## 4.4
+#### a) Make the normal and fitted values plots of residuals. Comment on why the normality and especially the homoscedasticity assumption seem to be violated. Does the fitted values plot suggest the log transformation of GPA?
+
+```{r}
+
+gpa <- read.csv(here::here("GPA.csv"))
+head(gpa)
+gpa_fit <- lm(GPA ~ Verbal*Math + I(Verbal^2) + I(Math^2), data = gpa)
+par(mfrow = c(1,2))
+plot(gpa_fit, which = 1:2)
+
+```
+
+Both the homoscedasticity and the normality assumptions seem to be violated. 
+
+As shown in the Fitted Values plot, the residuals seem to be more spread out as fitted value increases, which implies that variances are not constant. It does suggest log transformation because the standard error of residuals seems to be proportional to the fitted value.
+
+As shown in the normal Q-Q plot, the point deviated from the straight line at two ends, which implies sysmetric distribution with fat tails. 
+
+#### b) Fit the same model using log(GPA) as the response variable. Make the normal and fitted values plots of residuals.
+
+```{r}
+
+gpa_log <- lm(log(GPA) ~ Verbal*Math + I(Verbal^2) + I(Math^2), data = gpa)
+par(mfrow = c(1,2))
+plot(gpa_log, which = 1:2)
+
+```
+
+The normality assumption seems to be satisfied, but not the homoscedasticity assumption. As shown in the Fitted Value plot, the variances of the residuals are not constant throughout. Therefore, we believed the homoscedasticity assumption is still violated.
+
+
+## 4.5
+#### Refer to Exercise 3.11 on modeling research expenditures of the top 30 engineering schools using the number of faculty and the number of PhD students as predictor variables. The two scatter plots are shown in Figures 4.11 and 4.12 with each data point labeled by the abbreviated name of the university. Identify the outliers and influential observations in the data using appropriate diagnostic statistics. Provide plausible explanations for why these universities are flagged.
+
+```{r}
+
+research <- read.csv('Research.csv')
+research$Research <- gsub("\\$" , "", research$Research)
+research$Research <- as.numeric(gsub("\\," , "", research$Research))
+rownames(research) <- research$University
+research <- research[, -1]
+research_fit <- lm(Research ~ Faculty + PhD, data = research)
+par(mfrow = c(1,2))
+plot(research_fit, which = c(1, 4, 6))
+
+outlierTest(research_fit)
+# MIT has an rstudent score of 5.04.
+
+cooks.distance(research_fit)[cooks.distance(research_fit) > qf(0.1, 3, nrow(research) - 3)]
+# MIT, GaTech, and UIUC have the following cook's distance scores: 1.14, 0.42, 0.30.
+
+```
+
+According to the outlier test and residual plot, MIT is the outlier. 
+
+Based on Cook's Distance, the influential observations are MIT, UIUC, and Georgia Tech.
+
+MIT has much greater research expenditure and research expenditure per faculty ratio than any other schools. Georgia Tech has a great number of faculty and PhD students, but its research expenditure is less than expected. UIUC has a great number of faculty, but its research expenditure per faculty is not as much as the other schools.
+
+
+## 4.6 
+#### a) Make normal plots for residuals from both regressions. Has the log transformation of Salary improved normality?
+```{r}
+
+# 3.14 Part(a)
+salaries <- read.csv("salaries.csv", stringsAsFactors = TRUE)
+salaries$Gender <- relevel(salaries$Gender, "Male")
+salaries$Dept <- relevel(salaries$Dept, "Purchase")
+find_significant <- lm(log10(Salary) ~ YrsEm + PriorYr + Education + Super + Gender + Dept, data = salaries)
+summary(find_significant)
+
+```
+
+As one may observe, only "YrsEm", "Education", and "Dept" have coefficients significantly different from 0.
+
+```{r}
+
+fit <- lm(Salary ~ YrsEm + Education + Dept, data = salaries)
+logfit <- lm(log(Salary) ~ YrsEm + Education + Dept, data = salaries)
+
+# Normal Plots
+par(mfrow = c(1, 2))
+plot(fit, which = 2, main = "Salary Model")
+plot(logfit, which = 2, main = "log(Salary) Model")
+
+```
+
+It seems that the log transformation of Salary has made the residuals less normal. In particular, the right tail after log transformation seems to be too short compared with normal distribution.
+
+#### b) Make fitted values plots for residuals from both regressions. Has the log transformation of Salary improved homoscedasticity?
+```{r}
+
+# Fitted Values Plots
+par(mfrow = c(1, 2))
+plot(fit, which = 1, main = "Salary Model")
+plot(logfit, which = 1, main = "log(Salary) Model")
+
+```
+
+It seems that the log transformation has improved homoscedasticity slightly.
+
+## 4.7
+#### Do run test on Soft Drink Sales Data.
+
+```{r}
+
+n_1 <- 12
+n_2 <- 8
+n <- n_1 + n_2
+E_R <- 1 + 2*n_1*n_2/n
+Var_R <- 2*n_1*n_2*(2*n_1*n_2 - n)/((n-1)*n^2)
+R <- 11
+z <- (R - E_R) / sqrt(Var_R)
+z
+
+# z is great than the critical value 0.05, so the autocorrelation coefficient is not significantly greater than 0.
+
+```
+
+## 4.8
+#### a) Make a scatter plot of the two predictors. Which observation appears to be influential?
+
+```{r}
+
+woodbeam <- read.csv(here::here("woodbeam.csv"))
+
+ggplot(woodbeam, aes(x = Specific.Gravity, y = Strength)) + geom_point()
+ggplot(woodbeam, aes(x = Moisture, y = Strength)) + geom_point()
+plot(Moisture ~ Specific.Gravity, data = woodbeam)
+
+```
+
+It appears that the point at the bottom left corner of the gravity vs. moisture plot (i.e observation #4 ) deviates from the rest of the sample, due to its unsual (i.e. unusally small) combination of gravity and moisture values.
+
+#### b) Is that observation influential using the leverage rule?
+
+```{r}
+mod <- lm(Strength ~ Specific.Gravity + Moisture, woodbeam)
+
+H <- lm.influence(mod)$hat
+H[H > 2*(2+1)/10]
+#the hat value of observation #4 is 0.604, greater than 0.6. So observation #4 is influential by the leverage rule.
+```
+
+The hat value of observation #4 is 0.604, greater than 0.6. So observation #4 is influential by the leverage rule.
+
+```{r}
+cooks.distance(mod)[4]
+qf(0.1, 3, nrow(woodbeam) - 3)
+
+cooks.distance(mod)[4] > qf(0.1, 3, nrow(woodbeam) - 3)
+```
+
+Both the leverage rule (0.604 > 0.6 )and cook's distance (0.4756 > 0.1899) show that observation #4 is influential.
+
+#### Compare equations before and after omitting the influential observation. Does the fit change much?
+```{r}
+
+woodbeam_omit <- woodbeam[-c(4),]
+mod_omit <- lm(Strength ~ Specific.Gravity + Moisture, woodbeam_omit)
+coef(mod)
+coef(mod_omit)
+
+```
+
+The coefficients of the new fit (without the influential point) did change significantly, from $y = 10.30 +8.49x_1 - 0.27x_2$ to $y = 12.41 + 6.80x_1 -0.39x_2$. 
+
+## 4.9
+#### We have seen in 4.7.1 that the observation (x = 19; y = 12.50) in the Anscombe Data Set IV is influential and that its leverage equals 1. Is the Cook’s distance for this observation defined? Why or why not?
+
+Answer: The Cook's distance here is undefined. We could calculate Cook's distance by $D_i = (\frac{e_i^*}{\sqrt{p + 1}})^2 (\frac{h_{ii}}{1 - h_{ii}})$. According to the regression model, the expected value of $y_i$ (the outlier term) is precisely $y_i$, meaning that the $h_{ii}$ term equals $1$ for $y_i$, and $0$ for all the other $y$ terms. Hence, the denominator of $D_i$ is $0$, and $D_i$ is undefined. Conceptually, the "fit" for the plot without the outlier would be a vertical line, which makes the new fitted value undefined. Since Cook's Distance calculates the degree to which the influential point changes the fitted value by comparing the two fitted models, it would be undefined if one of the fitted values is undefined.
