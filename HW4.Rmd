@@ -1,0 +1,170 @@
+---
+title: "HW4"
+author: 'Group #9: Qiana Yang, Yijun Wu, Qiaozhen Wu, Dian Yu'
+date: "10/14/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+library(car)
+library(glmnet)
+```
+
+#### 4.10
+
+```{r}
+
+x1 <- c(8, 8, 8, 0, 0, 0, 2, 2, 2, 0, 0, 0)
+x2 <- c(1, 1, 1, rep(0, 3), rep(7, 3), rep(0, 3))
+x3 <- c(rep(1, 3), rep(9, 3), rep(0, 6))
+x4 <- c(1, 0, 0, rep(1, 6), rep(10, 3))
+
+webster <- data.frame(x1, x2, x3, x4)
+
+# correlation matrix
+cor(webster)
+# no correlation exceeds 0.5 in absolute value.
+
+# VIFs
+solve(cor(webster))
+# looking at the diagonal entries, the VIFs for the predictors are 178.29, 158.04, 257.91, and 289.38 respectively.
+
+```
+#### 4.11
+
+```{r}
+
+mpg <- read.csv(here::here("mpg.csv"))
+head(mpg)
+
+# correlation matrix
+cor(mpg[-1])
+# with the exception of acceleration, all predictors are highly intercorrelated. Therefore, there is multicollinearity in the data.
+
+# fit a full model
+mpg_fit <- lm(mpg~., mpg)
+summary(mpg_fit)
+plot(mpg_fit, which = c(1,2,4))
+
+# overall F statistic is significant, but 3 out of 5 of the t values are nonsignificant.
+
+# drop displacement
+mpg_fit2 <- lm(mpg~cylinders + horsepower + weight + acceleration, mpg)
+summary(mpg_fit2)
+plot(mpg_fit2, which = c(1,2,4))
+vif(mpg_fit2)
+# adjusted R^2 for this new model increased slightly. Significance level for the four remaining predictors improved overall, with the exception of acceleration.
+
+# inverse transformation
+gp100m_fit <- lm(100/mpg ~ cylinders + horsepower + weight + acceleration, mpg)
+plot(gp100m_fit, which = c(1,2,4))
+vif(gp100m_fit)
+# variability of the residuals is more consistent. VIF does not change, and that's because we are only doing transformation on the y's (and hence the correlation between the x's still remains the same).
+
+100/predict(gp100m_fit, newdata=data.frame(cylinders = 6, horsepower = 105, weight = 3000, acceleration = 15), interval="prediction")
+# fit for mpg is 20.6, with 16 and 28.9 as lower and upper bounds.
+
+```
+
+#### 4.12
+
+```{r}
+
+x1 <- c(rep(1300, 6), rep(1200, 6), rep(1100, 4))
+x2 <- c(7.5, 9, 11, 13.5, 17, 23, 5.3, 7.5, 11, 13.5, 17, 23, 5.3, 7.5, 11, 17)
+x3 <- c(0.012, 0.012, 0.0115, 0.013, 0.0135, 0.012, 0.04, 0.038, 0.032, 0.026, 0.034, 0.041, 0.084, 0.098, 0.092, 0.086)
+y <- c(49, 50.2, 50.5, 48.5, 47.5, 44.5, 28, 31.5, 34.5, 35, 38, 38.5, 15, 17, 20.5, 29.5)
+plot(data.frame(x1,x2,x3))
+
+cor(data.frame(x1, x2, x3))
+# x1 is highly correlated with x3, signifying multicollinearity.
+
+acefit <- lm(y~x1 + x2 + x3 + x1:x2 + x1:x3 + x2:x3 + I(x1^2) + I(x2^2) + I(x3^2))
+summary(acefit)
+vif(acefit)
+# all of the VIFs are extremely high, signifying strong multicollinearity.
+ 
+avgx1 <- x1 - mean(x1)
+avgx2 <- x2 - mean(x2)
+avgx3 <- x3 - mean(x3)
+vif(lm(y~avgx1 + avgx2 + avgx3 + avgx1:avgx2 + avgx1:avgx3 + avgx2:avgx3 + I(avgx1^2) + I(avgx2^2) + I(avgx3^2)))
+# the VIFs are still very high.
+
+```
+
+#### 5.5 (Gas mileages of cars: Ridge and lasso regressions) Perform ridge and lasso regressions on the gas mileage data considered in Exercise 4.11 and compare the results with those of LS regression.
+
+```{r}
+
+mpg <- read.csv(here::here("mpg.csv"))
+head(mpg)
+
+# ridge regression
+set.seed(12345)
+y <- mpg$mpg
+x <- model.matrix(lm(mpg~., mpg)) 
+ridgefit <- cv.glmnet(x, y, alpha = 0, lambda = seq(0, 5, 0.001), nfold = 10)
+lambdaridge <- ridgefit$lambda.min
+lambdaridge
+small.lambda.index <- which(ridgefit$lambda == ridgefit$lambda.min)
+small.lambda.betas <- coef(ridgefit$glmnet.fit)[,small.lambda.index]
+small.lambda.betas
+r2 <- max(1 - ridgefit$cvm/var(y))
+r2
+# the fit is: y = -0.42x1 - 0.006x2  - 0.046x3 - 0.004x4 - 0.057x5 + 45.56. R squared is 0.7006621.
+
+# compare with coefficients of the ls fit
+coef(mpg_fit)
+# the coefficients in the ridge regression model differ slightly from those in the original ls model. The coefficients within the ridge regression model have become more neutralized.
+
+# lasso regression
+lassofit <- cv.glmnet(x, y, alpha = 1, lambda = seq(0, 5, 0.001), nfold = 10)
+lambdalasso <- lassofit$lambda.min
+lambdalasso
+small.lambda.index <- which(lassofit$lambda == lassofit$lambda.min)
+small.lambda.betas <- coef(lassofit$glmnet.fit)[,small.lambda.index]
+small.lambda.betas
+r2 <- max(1 - lassofit$cvm/var(y))
+r2
+# the fit is: y = -0.36x1 - 0.0002x2 - 0.041x3 - 0.005x4 + 45.34. R squared is 0.6985505.
+# the lasso regression dropped the acceleration term entirely and set the effect of displacement and weight to minimum.
+
+```
+
+
+```{r}
+acetylene = read.csv("acetylene.csv")
+y = acetylene$y
+x = model.matrix(y ~ ., acetylene)
+x
+# Ridge Regression
+set.seed(1323462252)
+ridge_cv = cv.glmnet(x, y, alpha = 0, lambda = seq(0, 5, 0.001), nfold = 4)
+lambda_ridge = ridge_cv$lambda.min
+ridge_coef = coef(ridge_cv$glmnet.fit)[,which(ridge_cv$lambda == lambda_ridge)]
+# Lasso Regression
+
+lasso_cv = cv.glmnet(x, y, alpha = 1, lambda = seq(0, 5, 0.001), nfold = 4)
+lambda_lasso = lasso_cv$lambda.min
+lasso_coef = coef(lasso_cv$glmnet.fit)[,which(lasso_cv$lambda == lambda_lasso)]
+# LS Regression
+ls_fit = lm(y ~ ., acetylene)
+ls_coef = ls_fit$coefficients
+```
+
+```{r}
+# Print estimated coefficients without scientific notation
+# Ridge coefficients
+format(ridge_coef, scientific = FALSE)
+# Lasso coefficients
+format(lasso_coef, scientific = FALSE)
+# LS coefficients
+format(ls_coef, scientific = FALSE)
+```
+For the ridge regression, all estimated coefficients are smaller than their corresponding LS estimations in absolute values. In other words, the ridge regression shrinks all coefficients smoothly.
+For the lasso regression, variables x1, x3, and x1x2 have estimated coefficients of 0, meaning that they are dropped from the model.

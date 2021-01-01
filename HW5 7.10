@@ -1,0 +1,29 @@
+---
+title: "HW5 7.10"
+author: "Qiana Yang"
+date: "10/25/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+7.10
+
+```{r}
+CCR1 <- 9000/10000 #0.9
+specificity1 <- 8100/9000 #0.9
+sensitivity1 <- 900/1000 #0.9
+precision1 <- 900/1800 #0.5
+recall1 <- 0.9 #0.9
+F1 <- 1/(0.5*((1/precision1) + (1/recall1))) #0.643
+
+CCR2 <- 9000/10000 #0.9
+specificity2 <- 8100/9900 #0.82
+sensitivity2 <- 90/100 #0.9
+precision2 <- 90/1080 #0.083
+recall2 <- 0.9 #0.9
+F2 <- 1/(0.5*((1/precision2) + (1/recall2))) #0.153
+
+# Both systems have low levels of precision - out of all the documents that the first system deems relevant, half of them are irrelevant. Out of all the documents that the second system deems relevant, more than 90% of them are irrelevant. The systems are performing well when comparing all other measures.

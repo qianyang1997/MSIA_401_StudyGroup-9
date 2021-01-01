@@ -1,0 +1,819 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\hypersetup{
+  pdftitle={HW4MSIA401},
+  pdfauthor={Qiaozhen Wu, Qiana Yang, Dian Yu, Yijun Wu},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+\urlstyle{same} % disable monospaced font for URLs
+\usepackage[margin=1in]{geometry}
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.77,0.63,0.00}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\usepackage{graphicx,grffile}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+% Set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+
+\title{HW4MSIA401}
+\author{Qiaozhen Wu, Qiana Yang, Dian Yu, Yijun Wu}
+\date{10/18/2020}
+
+\begin{document}
+\maketitle
+
+\hypertarget{r-markdown}{%
+\subsection{R Markdown}\label{r-markdown}}
+
+\hypertarget{section}{%
+\subsection{4.10}\label{section}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{library}\NormalTok{(car)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Loading required package: carData
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{library}\NormalTok{(dplyr)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Attaching package: 'dplyr'
+\end{verbatim}
+
+\begin{verbatim}
+## The following object is masked from 'package:car':
+## 
+##     recode
+\end{verbatim}
+
+\begin{verbatim}
+## The following objects are masked from 'package:stats':
+## 
+##     filter, lag
+\end{verbatim}
+
+\begin{verbatim}
+## The following objects are masked from 'package:base':
+## 
+##     intersect, setdiff, setequal, union
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{data <-}\StringTok{ }\KeywordTok{c}\NormalTok{(}\DecValTok{8}\NormalTok{,}\DecValTok{1}\NormalTok{,}\DecValTok{1}\NormalTok{,}\DecValTok{1}\NormalTok{,}
+          \DecValTok{8}\NormalTok{,}\DecValTok{1}\NormalTok{,}\DecValTok{1}\NormalTok{,}\DecValTok{0}\NormalTok{,}
+          \DecValTok{8}\NormalTok{,}\DecValTok{1}\NormalTok{,}\DecValTok{1}\NormalTok{,}\DecValTok{0}\NormalTok{,}
+          \DecValTok{0}\NormalTok{,}\DecValTok{0}\NormalTok{,}\DecValTok{9}\NormalTok{,}\DecValTok{1}\NormalTok{,}
+          \DecValTok{0}\NormalTok{,}\DecValTok{0}\NormalTok{,}\DecValTok{9}\NormalTok{,}\DecValTok{1}\NormalTok{,}
+          \DecValTok{0}\NormalTok{,}\DecValTok{0}\NormalTok{,}\DecValTok{9}\NormalTok{,}\DecValTok{1}\NormalTok{,}
+          \DecValTok{2}\NormalTok{,}\DecValTok{7}\NormalTok{,}\DecValTok{0}\NormalTok{,}\DecValTok{1}\NormalTok{,}
+          \DecValTok{2}\NormalTok{,}\DecValTok{7}\NormalTok{,}\DecValTok{0}\NormalTok{,}\DecValTok{1}\NormalTok{,}
+          \DecValTok{2}\NormalTok{,}\DecValTok{7}\NormalTok{,}\DecValTok{0}\NormalTok{,}\DecValTok{1}\NormalTok{,}
+          \DecValTok{0}\NormalTok{,}\DecValTok{0}\NormalTok{,}\DecValTok{0}\NormalTok{,}\DecValTok{10}\NormalTok{,}
+          \DecValTok{0}\NormalTok{,}\DecValTok{0}\NormalTok{,}\DecValTok{0}\NormalTok{,}\DecValTok{10}\NormalTok{,}
+          \DecValTok{0}\NormalTok{,}\DecValTok{0}\NormalTok{,}\DecValTok{0}\NormalTok{,}\DecValTok{10}\NormalTok{)}
+\NormalTok{webster <-}\StringTok{ }\KeywordTok{data.frame}\NormalTok{(}\KeywordTok{cbind}\NormalTok{(}\KeywordTok{matrix}\NormalTok{(data, }\DataTypeTok{nrow =} \DecValTok{12}\NormalTok{, }\DataTypeTok{ncol =} \DecValTok{4}\NormalTok{, }\DataTypeTok{byrow =} \OtherTok{TRUE}\NormalTok{), }\KeywordTok{rep}\NormalTok{(}\DecValTok{10}\NormalTok{, }\DecValTok{12}\NormalTok{)))}
+\KeywordTok{colnames}\NormalTok{(webster) <-}\StringTok{ }\KeywordTok{c}\NormalTok{(}\StringTok{"x1"}\NormalTok{, }\StringTok{"x2"}\NormalTok{,}\StringTok{"x3"}\NormalTok{, }\StringTok{"x4"}\NormalTok{, }\StringTok{"y"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{a}{%
+\subsubsection{(a)}\label{a}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{cor}\NormalTok{(webster[, }\DecValTok{-5}\NormalTok{])}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##             x1          x2         x3         x4
+## x1  1.00000000  0.05230658 -0.3433818 -0.4976109
+## x2  0.05230658  1.00000000 -0.4315953 -0.3706964
+## x3 -0.34338179 -0.43159531  1.0000000 -0.3551214
+## x4 -0.49761095 -0.37069641 -0.3551214  1.0000000
+\end{verbatim}
+
+\hypertarget{no-correlation-coefficent-exceed-0.5-in-absolute-value.-therefore-correlations-do-no-indicate-multilinearity.}{%
+\subsubsection{No correlation coefficent exceed 0.5 in absolute value.
+Therefore, correlations do no indicate
+multilinearity.}\label{no-correlation-coefficent-exceed-0.5-in-absolute-value.-therefore-correlations-do-no-indicate-multilinearity.}}
+
+\hypertarget{b}{%
+\subsubsection{(b)}\label{b}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{fit <-}\StringTok{ }\KeywordTok{lm}\NormalTok{(y }\OperatorTok{~}\NormalTok{., }\DataTypeTok{data =}\NormalTok{ webster)}
+\KeywordTok{vif}\NormalTok{(fit)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##       x1       x2       x3       x4 
+## 178.2874 158.0460 257.9074 289.3750
+\end{verbatim}
+
+\hypertarget{all-vif-exceed-150-and-the-greatest-is-289.375.-therefore-vifs-indicate-multilinearity.}{%
+\subsubsection{All vif exceed 150 and the greatest is 289.375.
+Therefore, vifs indicate
+multilinearity.}\label{all-vif-exceed-150-and-the-greatest-is-289.375.-therefore-vifs-indicate-multilinearity.}}
+
+\hypertarget{section-1}{%
+\subsection{4.11}\label{section-1}}
+
+\hypertarget{a-1}{%
+\subsubsection{(a)}\label{a-1}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{mpg<-}\StringTok{ }\KeywordTok{read.csv}\NormalTok{(here}\OperatorTok{::}\KeywordTok{here}\NormalTok{(}\StringTok{"mpg.csv"}\NormalTok{))}
+\KeywordTok{cor}\NormalTok{(mpg)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##                     mpg  cylinders displacement horsepower     weight
+## mpg           1.0000000 -0.7776175   -0.8051269 -0.7784268 -0.8322442
+## cylinders    -0.7776175  1.0000000    0.9508233  0.8429834  0.8975273
+## displacement -0.8051269  0.9508233    1.0000000  0.8972570  0.9329944
+## horsepower   -0.7784268  0.8429834    0.8972570  1.0000000  0.8645377
+## weight       -0.8322442  0.8975273    0.9329944  0.8645377  1.0000000
+## acceleration  0.4233285 -0.5046834   -0.5438005 -0.6891955 -0.4168392
+##              acceleration
+## mpg             0.4233285
+## cylinders      -0.5046834
+## displacement   -0.5438005
+## horsepower     -0.6891955
+## weight         -0.4168392
+## acceleration    1.0000000
+\end{verbatim}
+
+\hypertarget{yes-there-is-multicollinearity-since-there-are-values-like-0.95-and-0.8-which-are-all-over-0.7.}{%
+\subsubsection{Yes there is multicollinearity since there are values
+like 0.95 and 0.8 which are all over
+0.7.}\label{yes-there-is-multicollinearity-since-there-are-values-like-0.95-and-0.8-which-are-all-over-0.7.}}
+
+\#\#\#(b)
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{fit_}\DecValTok{5}\NormalTok{ <-}\StringTok{ }\KeywordTok{lm}\NormalTok{(mpg }\OperatorTok{~}\StringTok{ }\NormalTok{cylinders}\OperatorTok{+}\NormalTok{displacement}\OperatorTok{+}\NormalTok{horsepower}\OperatorTok{+}\NormalTok{weight }\OperatorTok{+}\StringTok{ }\NormalTok{acceleration , }\DataTypeTok{data =}\NormalTok{ mpg)}
+\KeywordTok{summary}\NormalTok{ (fit_}\DecValTok{5}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Call:
+## lm(formula = mpg ~ cylinders + displacement + horsepower + weight + 
+##     acceleration, data = mpg)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -11.5816  -2.8618  -0.3404   2.2438  16.3416 
+## 
+## Coefficients:
+##                Estimate Std. Error t value Pr(>|t|)    
+## (Intercept)   4.626e+01  2.669e+00  17.331   <2e-16 ***
+## cylinders    -3.979e-01  4.105e-01  -0.969   0.3330    
+## displacement -8.313e-05  9.072e-03  -0.009   0.9927    
+## horsepower   -4.526e-02  1.666e-02  -2.716   0.0069 ** 
+## weight       -5.187e-03  8.167e-04  -6.351    6e-10 ***
+## acceleration -2.910e-02  1.258e-01  -0.231   0.8171    
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 4.247 on 386 degrees of freedom
+## Multiple R-squared:  0.7077, Adjusted R-squared:  0.7039 
+## F-statistic: 186.9 on 5 and 386 DF,  p-value: < 2.2e-16
+\end{verbatim}
+
+\hypertarget{multicollinearity-is-reflected-in-the-fact-that-three-of-the-variables---cylinders-displacement-and-acceleration--all-appears-to-be-insignificant-overall-f-statistic-is-significant-but-3-out-of-5-of-the-t-values-are-nonsignificant.}{%
+\subsubsection{Multicollinearity is reflected in the fact that three of
+the variables - cylinders, displacement and acceleration- all appears to
+be insignificant-- overall F statistic is significant, but 3 out of 5 of
+the t values are
+nonsignificant.}\label{multicollinearity-is-reflected-in-the-fact-that-three-of-the-variables---cylinders-displacement-and-acceleration--all-appears-to-be-insignificant-overall-f-statistic-is-significant-but-3-out-of-5-of-the-t-values-are-nonsignificant.}}
+
+\hypertarget{c}{%
+\subsubsection{(c)}\label{c}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{fit_}\DecValTok{4}\NormalTok{ <-}\StringTok{ }\KeywordTok{lm}\NormalTok{(mpg }\OperatorTok{~}\StringTok{ }\NormalTok{cylinders}\OperatorTok{+}\NormalTok{horsepower}\OperatorTok{+}\NormalTok{weight }\OperatorTok{+}\StringTok{ }\NormalTok{acceleration , }\DataTypeTok{data =}\NormalTok{ mpg)}
+\KeywordTok{summary}\NormalTok{ (fit_}\DecValTok{4}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Call:
+## lm(formula = mpg ~ cylinders + horsepower + weight + acceleration, 
+##     data = mpg)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -11.5807  -2.8628  -0.3409   2.2427  16.3422 
+## 
+## Coefficients:
+##                Estimate Std. Error t value Pr(>|t|)    
+## (Intercept)  46.2739915  2.4481591  18.902  < 2e-16 ***
+## cylinders    -0.4004602  0.3032615  -1.321  0.18744    
+## horsepower   -0.0452970  0.0160604  -2.820  0.00504 ** 
+## weight       -0.0051902  0.0007341  -7.070 7.26e-12 ***
+## acceleration -0.0289828  0.1248944  -0.232  0.81661    
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 4.242 on 387 degrees of freedom
+## Multiple R-squared:  0.7077, Adjusted R-squared:  0.7047 
+## F-statistic: 234.2 on 4 and 387 DF,  p-value: < 2.2e-16
+\end{verbatim}
+
+\hypertarget{it-decreases-the-value-of-cylinders-and-makes-it-more-significant.-and-the-change-increased-ajusted-r-squated-slightly}{%
+\subsubsection{It decreases the value of cylinders and makes it more
+significant. And the change increased ajusted r squated
+slightly}\label{it-decreases-the-value-of-cylinders-and-makes-it-more-significant.-and-the-change-increased-ajusted-r-squated-slightly}}
+
+\hypertarget{d}{%
+\subsubsection{(d)}\label{d}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{plot}\NormalTok{(fit_}\DecValTok{4}\NormalTok{,}\DecValTok{2}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{MSIA401HW4_files/figure-latex/unnamed-chunk-7-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{plot}\NormalTok{(fit_}\DecValTok{4}\NormalTok{,}\DecValTok{1}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{MSIA401HW4_files/figure-latex/unnamed-chunk-7-2.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{vif}\NormalTok{ (fit_}\DecValTok{4}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##    cylinders   horsepower       weight acceleration 
+##     5.815763     8.305342     8.449468     2.580303
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{fit_inverse <-}\StringTok{ }\KeywordTok{lm}\NormalTok{((}\DecValTok{100}\OperatorTok{/}\NormalTok{mpg) }\OperatorTok{~}\StringTok{ }\NormalTok{cylinders}\OperatorTok{+}\NormalTok{horsepower}\OperatorTok{+}\NormalTok{weight }\OperatorTok{+}\StringTok{ }\NormalTok{acceleration , }\DataTypeTok{data =}\NormalTok{ mpg)}
+\KeywordTok{plot}\NormalTok{(fit_inverse,}\DecValTok{2}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{MSIA401HW4_files/figure-latex/unnamed-chunk-7-3.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{plot}\NormalTok{(fit_inverse,}\DecValTok{1}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{MSIA401HW4_files/figure-latex/unnamed-chunk-7-4.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{vif}\NormalTok{(fit_inverse)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##    cylinders   horsepower       weight acceleration 
+##     5.815763     8.305342     8.449468     2.580303
+\end{verbatim}
+
+\hypertarget{yes-the-transformation-removed-the-flaws-of-the-previous-model.-variability-of-the-residuals-is-more-consistent.-vif-does-not-change-and-thats-because-we-are-only-doing-transformation-on-the-ys-and-hence-the-correlation-between-the-xs-still-remains-the-same.}{%
+\subsubsection{Yes the transformation removed the flaws of the previous
+model. Variability of the residuals is more consistent. VIF does not
+change, and that's because we are only doing transformation on the y's
+(and hence the correlation between the x's still remains the
+same).}\label{yes-the-transformation-removed-the-flaws-of-the-previous-model.-variability-of-the-residuals-is-more-consistent.-vif-does-not-change-and-thats-because-we-are-only-doing-transformation-on-the-ys-and-hence-the-correlation-between-the-xs-still-remains-the-same.}}
+
+\#\#\#(e)
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\DecValTok{100}\OperatorTok{/}\KeywordTok{predict}\NormalTok{(fit_inverse, }\DataTypeTok{newdata =} \KeywordTok{data.frame}\NormalTok{(}\DataTypeTok{cylinders =} \DecValTok{6}\NormalTok{, }\DataTypeTok{horsepower=} \DecValTok{105}\NormalTok{, }\DataTypeTok{weight =} \DecValTok{3000}\NormalTok{, }\DataTypeTok{acceleration =} \DecValTok{15}\NormalTok{), }\DataTypeTok{interval =} \StringTok{"predict"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##        fit    lwr      upr
+## 1 20.59855 28.903 16.00109
+\end{verbatim}
+
+\hypertarget{section-2}{%
+\subsection{4.12}\label{section-2}}
+
+\#\#\#(a)
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{library}\NormalTok{ (tidyverse)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## -- Attaching packages ---------- tidyverse 1.3.0 --
+\end{verbatim}
+
+\begin{verbatim}
+## v ggplot2 3.3.2     v purrr   0.3.4
+## v tibble  3.0.3     v stringr 1.4.0
+## v tidyr   1.1.1     v forcats 0.5.0
+## v readr   1.3.1
+\end{verbatim}
+
+\begin{verbatim}
+## -- Conflicts ------------- tidyverse_conflicts() --
+## x dplyr::filter() masks stats::filter()
+## x dplyr::lag()    masks stats::lag()
+## x dplyr::recode() masks car::recode()
+## x purrr::some()   masks car::some()
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{acetylene <-}\StringTok{ }
+\StringTok{  }\KeywordTok{tribble}\NormalTok{(}\OperatorTok{~}\NormalTok{x1,  }\OperatorTok{~}\NormalTok{x2,   }\OperatorTok{~}\NormalTok{x3,   }\OperatorTok{~}\NormalTok{y,}
+           \DecValTok{1300}\NormalTok{, }\FloatTok{7.5}\NormalTok{,  }\FloatTok{0.0120}\NormalTok{, }\FloatTok{49.0}\NormalTok{,}
+           \DecValTok{1300}\NormalTok{, }\DecValTok{9}\NormalTok{,    }\FloatTok{0.0120}\NormalTok{, }\FloatTok{50.2}\NormalTok{,}
+           \DecValTok{1300}\NormalTok{, }\DecValTok{11}\NormalTok{,   }\FloatTok{0.0115}\NormalTok{, }\FloatTok{50.5}\NormalTok{,}
+           \DecValTok{1300}\NormalTok{, }\FloatTok{13.5}\NormalTok{, }\FloatTok{0.0130}\NormalTok{, }\FloatTok{48.5}\NormalTok{,}
+           \DecValTok{1300}\NormalTok{, }\DecValTok{17}\NormalTok{,   }\FloatTok{0.0135}\NormalTok{, }\FloatTok{47.5}\NormalTok{,}
+           \DecValTok{1300}\NormalTok{, }\DecValTok{23}\NormalTok{,   }\FloatTok{0.0120}\NormalTok{, }\FloatTok{44.5}\NormalTok{,}
+           \DecValTok{1200}\NormalTok{, }\FloatTok{5.3}\NormalTok{,  }\FloatTok{0.0400}\NormalTok{, }\FloatTok{28.0}\NormalTok{,}
+           \DecValTok{1200}\NormalTok{, }\FloatTok{7.5}\NormalTok{,  }\FloatTok{0.0380}\NormalTok{, }\FloatTok{31.5}\NormalTok{,}
+           \DecValTok{1200}\NormalTok{, }\DecValTok{11}\NormalTok{,   }\FloatTok{0.0320}\NormalTok{, }\FloatTok{34.5}\NormalTok{,}
+           \DecValTok{1200}\NormalTok{, }\FloatTok{13.5}\NormalTok{, }\FloatTok{0.0260}\NormalTok{, }\FloatTok{35.0}\NormalTok{,}
+           \DecValTok{1200}\NormalTok{, }\DecValTok{17}\NormalTok{,   }\FloatTok{0.0340}\NormalTok{, }\FloatTok{38.0}\NormalTok{,}
+           \DecValTok{1200}\NormalTok{, }\DecValTok{23}\NormalTok{,   }\FloatTok{0.0410}\NormalTok{, }\FloatTok{38.5}\NormalTok{,}
+           \DecValTok{1100}\NormalTok{, }\FloatTok{5.3}\NormalTok{,  }\FloatTok{0.0840}\NormalTok{, }\FloatTok{15.0}\NormalTok{,}
+           \DecValTok{1100}\NormalTok{, }\FloatTok{7.5}\NormalTok{,  }\FloatTok{0.0980}\NormalTok{, }\FloatTok{17.0}\NormalTok{,}
+           \DecValTok{1100}\NormalTok{, }\DecValTok{11}\NormalTok{,   }\FloatTok{0.0920}\NormalTok{, }\FloatTok{20.5}\NormalTok{,}
+           \DecValTok{1100}\NormalTok{, }\DecValTok{17}\NormalTok{,   }\FloatTok{0.0860}\NormalTok{, }\FloatTok{29.5}
+\NormalTok{           )}
+
+\NormalTok{fitx1x2 <-}\StringTok{ }\KeywordTok{lm}\NormalTok{ (x1 }\OperatorTok{~}\StringTok{ }\NormalTok{x2, }\DataTypeTok{data =}\NormalTok{ acetylene)}
+\NormalTok{fixx2x3 <-}\StringTok{ }\KeywordTok{lm}\NormalTok{ (x2 }\OperatorTok{~}\NormalTok{x3, }\DataTypeTok{data =}\NormalTok{ acetylene)}
+\NormalTok{fixx1x3 <-}\StringTok{ }\KeywordTok{lm}\NormalTok{ (x1}\OperatorTok{~}\NormalTok{x3, }\DataTypeTok{data =}\NormalTok{ acetylene)}
+\KeywordTok{plot}\NormalTok{(fitx1x2)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{MSIA401HW4_files/figure-latex/unnamed-chunk-9-1.pdf}
+\includegraphics{MSIA401HW4_files/figure-latex/unnamed-chunk-9-2.pdf}
+\includegraphics{MSIA401HW4_files/figure-latex/unnamed-chunk-9-3.pdf}
+\includegraphics{MSIA401HW4_files/figure-latex/unnamed-chunk-9-4.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{plot}\NormalTok{(acetylene[}\DecValTok{1}\OperatorTok{:}\DecValTok{3}\NormalTok{])}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{MSIA401HW4_files/figure-latex/unnamed-chunk-9-5.pdf}
+\#\#\# Yes x1 and x3 appears to be highly correlated.
+
+\#\#\#(b)
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{cor}\NormalTok{(acetylene)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##            x1         x2         x3          y
+## x1  1.0000000  0.2236278 -0.9582041  0.9450377
+## x2  0.2236278  1.0000000 -0.2402310  0.3700350
+## x3 -0.9582041 -0.2402310  1.0000000 -0.9139777
+## y   0.9450377  0.3700350 -0.9139777  1.0000000
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{sumtable <-}\KeywordTok{summary}\NormalTok{(acetylene)}
+\NormalTok{sumtable}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##        x1             x2              x3                y        
+##  Min.   :1100   Min.   : 5.30   Min.   :0.01150   Min.   :15.00  
+##  1st Qu.:1175   1st Qu.: 7.50   1st Qu.:0.01275   1st Qu.:29.12  
+##  Median :1200   Median :11.00   Median :0.03300   Median :36.50  
+##  Mean   :1212   Mean   :12.44   Mean   :0.04031   Mean   :36.11  
+##  3rd Qu.:1300   3rd Qu.:17.00   3rd Qu.:0.05175   3rd Qu.:47.75  
+##  Max.   :1300   Max.   :23.00   Max.   :0.09800   Max.   :50.50
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{#12.1 Yes I saw that the correlation between x1 and x3 is around 0.9 which is higher than 0.7,so there is multicollinearity. }
+\NormalTok{acetylene}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 16 x 4
+##       x1    x2     x3     y
+##    <dbl> <dbl>  <dbl> <dbl>
+##  1  1300   7.5 0.012   49  
+##  2  1300   9   0.012   50.2
+##  3  1300  11   0.0115  50.5
+##  4  1300  13.5 0.013   48.5
+##  5  1300  17   0.0135  47.5
+##  6  1300  23   0.012   44.5
+##  7  1200   5.3 0.04    28  
+##  8  1200   7.5 0.038   31.5
+##  9  1200  11   0.032   34.5
+## 10  1200  13.5 0.026   35  
+## 11  1200  17   0.034   38  
+## 12  1200  23   0.041   38.5
+## 13  1100   5.3 0.084   15  
+## 14  1100   7.5 0.098   17  
+## 15  1100  11   0.092   20.5
+## 16  1100  17   0.086   29.5
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{fixmodel_old<-}\StringTok{ }\KeywordTok{lm}\NormalTok{ (y}\OperatorTok{~}\StringTok{ }\NormalTok{x1}\OperatorTok{+}\NormalTok{x2}\OperatorTok{+}\NormalTok{x3}\OperatorTok{+}\NormalTok{x1}\OperatorTok{*}\NormalTok{x2}\OperatorTok{+}\NormalTok{x1}\OperatorTok{*}\NormalTok{x3}\OperatorTok{+}\NormalTok{x2}\OperatorTok{*}\NormalTok{x3}\OperatorTok{+}\KeywordTok{I}\NormalTok{(x1}\OperatorTok{^}\DecValTok{2}\NormalTok{)}\OperatorTok{+}\StringTok{ }\KeywordTok{I}\NormalTok{(x2}\OperatorTok{^}\DecValTok{2}\NormalTok{) }\OperatorTok{+}\StringTok{ }\KeywordTok{I}\NormalTok{(x3}\OperatorTok{^}\DecValTok{2}\NormalTok{),acetylene)}
+\KeywordTok{vif}\NormalTok{(fixmodel_old)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##           x1           x2           x3      I(x1^2)      I(x2^2)      I(x3^2) 
+## 2.856749e+06 1.095614e+04 2.017163e+06 2.501945e+06 6.573359e+01 1.266710e+04 
+##        x1:x2        x1:x3        x2:x3 
+## 9.802903e+03 1.428092e+06 2.403594e+02
+\end{verbatim}
+
+\hypertarget{all-of-the-vifs-are-extremely-high-signifying-strong-multicollinearity.}{%
+\subsubsection{All of the VIFs are extremely high, signifying strong
+multicollinearity.}\label{all-of-the-vifs-are-extremely-high-signifying-strong-multicollinearity.}}
+
+\hypertarget{c-1}{%
+\subsubsection{(c)}\label{c-1}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{library}\NormalTok{(}\StringTok{"car"}\NormalTok{)}
+\NormalTok{acetylene[}\StringTok{"x1"}\NormalTok{] <-}\StringTok{ }\NormalTok{acetylene[}\StringTok{"x1"}\NormalTok{] }\OperatorTok{-}\StringTok{ }\KeywordTok{mean}\NormalTok{(acetylene}\OperatorTok{$}\NormalTok{x1)}
+\NormalTok{acetylene[}\StringTok{"x2"}\NormalTok{]  <-acetylene[}\StringTok{"x2"}\NormalTok{] }\OperatorTok{-}\StringTok{ }\KeywordTok{mean}\NormalTok{(acetylene}\OperatorTok{$}\NormalTok{x2)}
+\NormalTok{acetylene[}\StringTok{"x3"}\NormalTok{] <-}\StringTok{ }\NormalTok{acetylene[}\StringTok{"x3"}\NormalTok{] }\OperatorTok{-}\StringTok{ }\KeywordTok{mean}\NormalTok{(acetylene}\OperatorTok{$}\NormalTok{x3)}
+\NormalTok{fixmodel_new <-}\StringTok{ }\KeywordTok{lm}\NormalTok{ (y}\OperatorTok{~}\StringTok{ }\NormalTok{x1}\OperatorTok{+}\NormalTok{x2}\OperatorTok{+}\NormalTok{x3}\OperatorTok{+}\NormalTok{x1}\OperatorTok{*}\NormalTok{x2}\OperatorTok{+}\NormalTok{x1}\OperatorTok{*}\NormalTok{x3}\OperatorTok{+}\NormalTok{x2}\OperatorTok{*}\NormalTok{x3}\OperatorTok{+}\KeywordTok{I}\NormalTok{(x1}\OperatorTok{^}\DecValTok{2}\NormalTok{)}\OperatorTok{+}\StringTok{ }\KeywordTok{I}\NormalTok{(x2}\OperatorTok{^}\DecValTok{2}\NormalTok{) }\OperatorTok{+}\StringTok{ }\KeywordTok{I}\NormalTok{(x3}\OperatorTok{^}\DecValTok{2}\NormalTok{), acetylene )}
+\KeywordTok{vif}\NormalTok{(fixmodel_new)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##          x1          x2          x3     I(x1^2)     I(x2^2)     I(x3^2) 
+##  375.247759    1.740631  680.280039 1762.575365    3.164318 1156.766284 
+##       x1:x2       x1:x3       x2:x3 
+##   31.037059 6563.345193   35.611286
+\end{verbatim}
+
+\hypertarget{yes-the-transformation-has-decreased-the-vif-value-but-the-vifs-are-still-very-high.}{%
+\subsubsection{Yes the transformation has decreased the vif value, but
+the VIFs are still very
+high.}\label{yes-the-transformation-has-decreased-the-vif-value-but-the-vifs-are-still-very-high.}}
+
+\hypertarget{gas-mileages-of-cars-ridge-and-lasso-regressions-perform-ridge-and-lasso-regressions-on-the-gas-mileage-data-considered-in-exercise-4.11-and-compare-the-results-with-those-of-ls-regression.}{%
+\subsection{5.5 (Gas mileages of cars: Ridge and lasso regressions)
+Perform ridge and lasso regressions on the gas mileage data considered
+in Exercise 4.11 and compare the results with those of LS
+regression.}\label{gas-mileages-of-cars-ridge-and-lasso-regressions-perform-ridge-and-lasso-regressions-on-the-gas-mileage-data-considered-in-exercise-4.11-and-compare-the-results-with-those-of-ls-regression.}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{library}\NormalTok{(glmnet)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Loading required package: Matrix
+\end{verbatim}
+
+\begin{verbatim}
+## 
+## Attaching package: 'Matrix'
+\end{verbatim}
+
+\begin{verbatim}
+## The following objects are masked from 'package:tidyr':
+## 
+##     expand, pack, unpack
+\end{verbatim}
+
+\begin{verbatim}
+## Loaded glmnet 4.0-2
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{mpg <-}\StringTok{ }\KeywordTok{read.csv}\NormalTok{(here}\OperatorTok{::}\KeywordTok{here}\NormalTok{(}\StringTok{"mpg.csv"}\NormalTok{))}
+\KeywordTok{head}\NormalTok{(mpg)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##   mpg cylinders displacement horsepower weight acceleration
+## 1  18         8          307        130   3504         12.0
+## 2  15         8          350        165   3693         11.5
+## 3  18         8          318        150   3436         11.0
+## 4  16         8          304        150   3433         12.0
+## 5  17         8          302        140   3449         10.5
+## 6  15         8          429        198   4341         10.0
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# ridge regression}
+\KeywordTok{set.seed}\NormalTok{(}\DecValTok{12345}\NormalTok{)}
+\NormalTok{y <-}\StringTok{ }\NormalTok{mpg}\OperatorTok{$}\NormalTok{mpg}
+\NormalTok{x <-}\StringTok{ }\KeywordTok{model.matrix}\NormalTok{(}\KeywordTok{lm}\NormalTok{(mpg}\OperatorTok{~}\NormalTok{., mpg)) }
+\NormalTok{ridgefit <-}\StringTok{ }\KeywordTok{cv.glmnet}\NormalTok{(x, y, }\DataTypeTok{alpha =} \DecValTok{0}\NormalTok{, }\DataTypeTok{lambda =} \KeywordTok{seq}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{5}\NormalTok{, }\FloatTok{0.001}\NormalTok{), }\DataTypeTok{nfold =} \DecValTok{10}\NormalTok{)}
+\NormalTok{lambdaridge <-}\StringTok{ }\NormalTok{ridgefit}\OperatorTok{$}\NormalTok{lambda.min}
+\NormalTok{lambdaridge}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 0.211
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{small.lambda.index <-}\StringTok{ }\KeywordTok{which}\NormalTok{(ridgefit}\OperatorTok{$}\NormalTok{lambda }\OperatorTok{==}\StringTok{ }\NormalTok{ridgefit}\OperatorTok{$}\NormalTok{lambda.min)}
+\NormalTok{small.lambda.betas <-}\StringTok{ }\KeywordTok{coef}\NormalTok{(ridgefit}\OperatorTok{$}\NormalTok{glmnet.fit)[,small.lambda.index]}
+\NormalTok{small.lambda.betas}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##  (Intercept)  (Intercept)    cylinders displacement   horsepower       weight 
+## 45.555448014  0.000000000 -0.418007354 -0.006214789 -0.045755247 -0.004347006 
+## acceleration 
+## -0.057291887
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{r2 <-}\StringTok{ }\KeywordTok{max}\NormalTok{(}\DecValTok{1} \OperatorTok{-}\StringTok{ }\NormalTok{ridgefit}\OperatorTok{$}\NormalTok{cvm}\OperatorTok{/}\KeywordTok{var}\NormalTok{(y))}
+\NormalTok{r2}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 0.7006621
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# the fit is: y = -0.42x1 - 0.006x2  - 0.046x3 - 0.004x4 - 0.057x5 + 45.56. R squared is 0.7006621.}
+
+\CommentTok{# compare with coefficients of the ls fit}
+\KeywordTok{coef}\NormalTok{(fit_}\DecValTok{5}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##   (Intercept)     cylinders  displacement    horsepower        weight 
+##  4.626431e+01 -3.979284e-01 -8.313012e-05 -4.525708e-02 -5.186917e-03 
+##  acceleration 
+## -2.910471e-02
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# the coefficients in the ridge regression model differ slightly from those in the original ls model. The coefficients within the ridge regression model have become more neutralized.}
+
+\CommentTok{# lasso regression}
+\NormalTok{lassofit <-}\StringTok{ }\KeywordTok{cv.glmnet}\NormalTok{(x, y, }\DataTypeTok{alpha =} \DecValTok{1}\NormalTok{, }\DataTypeTok{lambda =} \KeywordTok{seq}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{5}\NormalTok{, }\FloatTok{0.001}\NormalTok{), }\DataTypeTok{nfold =} \DecValTok{10}\NormalTok{)}
+\NormalTok{lambdalasso <-}\StringTok{ }\NormalTok{lassofit}\OperatorTok{$}\NormalTok{lambda.min}
+\NormalTok{lambdalasso}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 0.107
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{small.lambda.index <-}\StringTok{ }\KeywordTok{which}\NormalTok{(lassofit}\OperatorTok{$}\NormalTok{lambda }\OperatorTok{==}\StringTok{ }\NormalTok{lassofit}\OperatorTok{$}\NormalTok{lambda.min)}
+\NormalTok{small.lambda.betas <-}\StringTok{ }\KeywordTok{coef}\NormalTok{(lassofit}\OperatorTok{$}\NormalTok{glmnet.fit)[,small.lambda.index]}
+\NormalTok{small.lambda.betas}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##   (Intercept)   (Intercept)     cylinders  displacement    horsepower 
+## 45.3433472768  0.0000000000 -0.3593427798 -0.0002114289 -0.0413759469 
+##        weight  acceleration 
+## -0.0052282327  0.0000000000
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{r2 <-}\StringTok{ }\KeywordTok{max}\NormalTok{(}\DecValTok{1} \OperatorTok{-}\StringTok{ }\NormalTok{lassofit}\OperatorTok{$}\NormalTok{cvm}\OperatorTok{/}\KeywordTok{var}\NormalTok{(y))}
+\NormalTok{r2}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 0.6985505
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# the fit is: y = -0.36x1 - 0.0002x2 - 0.041x3 - 0.005x4 + 45.34. R squared is 0.6985505.}
+\CommentTok{# the lasso regression dropped the acceleration term entirely and set the effect of displacement and weight to minimum.}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{section-3}{%
+\subsection{5.6}\label{section-3}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{#acetylene = read.csv("acetylene.csv")}
+\NormalTok{y =}\StringTok{ }\NormalTok{acetylene}\OperatorTok{$}\NormalTok{y}
+\NormalTok{x =}\StringTok{ }\KeywordTok{model.matrix}\NormalTok{(y }\OperatorTok{~}\StringTok{ }\NormalTok{., acetylene)}
+
+\CommentTok{# Ridge Regression}
+\KeywordTok{set.seed}\NormalTok{(}\DecValTok{42}\NormalTok{)}
+\NormalTok{ridge_cv =}\StringTok{  }\KeywordTok{cv.glmnet}\NormalTok{(x, y, }\DataTypeTok{alpha =} \DecValTok{0}\NormalTok{, }\DataTypeTok{lambda =} \KeywordTok{seq}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{5}\NormalTok{, }\FloatTok{0.001}\NormalTok{), }\DataTypeTok{nfold =} \DecValTok{4}\NormalTok{)}
+\NormalTok{lambda_ridge =}\StringTok{ }\NormalTok{ridge_cv}\OperatorTok{$}\NormalTok{lambda.min}
+\NormalTok{ridge_coef =}\StringTok{ }\KeywordTok{coef}\NormalTok{(ridge_cv}\OperatorTok{$}\NormalTok{glmnet.fit)[,}\KeywordTok{which}\NormalTok{(ridge_cv}\OperatorTok{$}\NormalTok{lambda }\OperatorTok{==}\StringTok{ }\NormalTok{lambda_ridge)]}
+
+\CommentTok{# Lasso Regression}
+\KeywordTok{set.seed}\NormalTok{(}\DecValTok{43}\NormalTok{)}
+\NormalTok{lasso_cv =}\StringTok{ }\KeywordTok{cv.glmnet}\NormalTok{(x, y, }\DataTypeTok{alpha =} \DecValTok{1}\NormalTok{, }\DataTypeTok{lambda =} \KeywordTok{seq}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{5}\NormalTok{, }\FloatTok{0.001}\NormalTok{), }\DataTypeTok{nfold =} \DecValTok{4}\NormalTok{)}
+\NormalTok{lambda_lasso =}\StringTok{ }\NormalTok{lasso_cv}\OperatorTok{$}\NormalTok{lambda.min}
+\NormalTok{lasso_coef =}\StringTok{ }\KeywordTok{coef}\NormalTok{(lasso_cv}\OperatorTok{$}\NormalTok{glmnet.fit)[,}\KeywordTok{which}\NormalTok{(lasso_cv}\OperatorTok{$}\NormalTok{lambda }\OperatorTok{==}\StringTok{ }\NormalTok{lambda_lasso)]}
+
+\CommentTok{# LS Regression}
+\NormalTok{ls_fit =}\StringTok{ }\KeywordTok{lm}\NormalTok{(y }\OperatorTok{~}\StringTok{ }\NormalTok{., acetylene)}
+\NormalTok{ls_coef =}\StringTok{ }\NormalTok{ls_fit}\OperatorTok{$}\NormalTok{coefficients}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# Print estimated coefficients without scientific notation}
+\CommentTok{# Ridge coefficients}
+\KeywordTok{format}\NormalTok{(ridge_coef, }\DataTypeTok{scientific =} \OtherTok{FALSE}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##   (Intercept)   (Intercept)            x1            x2            x3 
+## " 36.1062500" "  0.0000000" "  0.1064389" "  0.3406627" "-67.8145213"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# Lasso coefficients}
+\KeywordTok{format}\NormalTok{(lasso_coef, }\DataTypeTok{scientific =} \OtherTok{FALSE}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##  (Intercept)  (Intercept)           x1           x2           x3 
+## "36.1062500" " 0.0000000" " 0.1188331" " 0.1867655" "-9.8979066"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# LS coefficients}
+\KeywordTok{format}\NormalTok{(ls_coef, }\DataTypeTok{scientific =} \OtherTok{FALSE}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##   (Intercept)            x1            x2            x3 
+## " 36.1062500" "  0.1268539" "  0.3481576" "-19.0216969"
+\end{verbatim}
+
+\hypertarget{for-the-ridge-regression-all-estimated-coefficients-are-smaller-than-their-corresponding-ls-estimations-in-absolute-values.-in-other-words-the-ridge-regression-shrinks-all-coefficients-smoothly.}{%
+\subsection{For the ridge regression, all estimated coefficients are
+smaller than their corresponding LS estimations in absolute values. In
+other words, the ridge regression shrinks all coefficients
+smoothly.}\label{for-the-ridge-regression-all-estimated-coefficients-are-smaller-than-their-corresponding-ls-estimations-in-absolute-values.-in-other-words-the-ridge-regression-shrinks-all-coefficients-smoothly.}}
+
+\hypertarget{for-the-lasso-regression-variables-x1-x3-and-x1x2-have-estimated-coefficients-of-0-meaning-that-they-are-dropped-from-the-model.}{%
+\subsection{For the lasso regression, variables x1, x3, and x1x2 have
+estimated coefficients of 0, meaning that they are dropped from the
+model.}\label{for-the-lasso-regression-variables-x1-x3-and-x1x2-have-estimated-coefficients-of-0-meaning-that-they-are-dropped-from-the-model.}}
+
+\end{document}

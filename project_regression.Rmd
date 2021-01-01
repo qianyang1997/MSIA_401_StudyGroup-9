@@ -1,0 +1,102 @@
+---
+title: "ProjectEDA"
+author: "Qiana Yang"
+date: "11/27/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(car)
+library(glmnet)
+```
+
+
+## Linear regression
+# Least square
+```{r}
+reg_train['consistency'] <- reg_train$frequency/reg_train$tof
+
+# least square on new frequency
+ls_fit_freq <- lm(logtargamt~recency+frequency+tof, reg_train)
+
+# least square on new amount
+ls_fit_amt <- lm(logtargamt~recency+amount+tof, reg_train)
+
+# least square on old frequency
+ls_fit_freq_orig <- lm(logtargamt~recency+frequency_orig+tof, reg_train)
+# features not significant
+
+# least square on old amount
+ls_fit_amt_orig <- lm(logtargamt~recency+amount_orig+tof, reg_train)
+
+ls <- list(coefficients(ls_fit_freq), coefficients(ls_fit_freq_orig), coefficients(ls_fit_amt), coefficients(ls_fit_amt_orig))
+```
+
+# Lasso & ridge
+```{r}
+# x, y for lasso and ridge regression
+y <- reg_train$logtargamt
+x_freq <- model.matrix(y~recency+tof+frequency, reg_train) 
+x_freq_orig <- model.matrix(y~recency+tof+frequency_orig, reg_train)
+x_amt <- model.matrix(y~recency+tof+amount, reg_train)
+x_amt_orig <- model.matrix(y~recency+tof+amount_orig, reg_train)
+features <- list(x_freq, x_freq_orig, x_amt, x_amt_orig)
+
+# regression
+set.seed(12345)
+lasso <- list()
+ridge <- list()
+index <- 1
+for (feature in features) {
+  # lasso
+  lassofit <- cv.glmnet(feature, y, alpha = 1, lambda = seq(0, 5, 0.001), nfold = 10)
+  lambdalasso <- lassofit$lambda.min
+small.lambda.index <- which(lassofit$lambda == lassofit$lambda.min)
+  small.lambda.lasso <- coef(lassofit$glmnet.fit)[,small.lambda.index]
+  lasso[[index]] <- small.lambda.lasso[c(1, 3:5)]
+  
+  # ridge
+  ridgefit <- cv.glmnet(feature, y, alpha = 0, lambda = seq(0, 5, 0.001), nfold = 10)
+  lambdaridge <- ridgefit$lambda.min
+small.lambda.index <- which(ridgefit$lambda == ridgefit$lambda.min)
+  small.lambda.ridge <- coef(ridgefit$glmnet.fit)[,small.lambda.index]
+  ridge[[index]] <- small.lambda.ridge[c(1, 3:5)]
+  
+  index <- index + 1
+}
+```
+
+
+```{r}
+# fit on test set and calculate MSE
+
+MSE <- function(y, fit, n) 1/n * sum((y - fit)^2)
+
+order <- c('frequency', 'frequency_orig', 'amount', 'amount_orig')
+
+for (i in 1:4) {
+  predicted_response <- function(coef) coef[1] + reg_test$recency * coef[2] + reg_test$tof * coef[3] + reg_test[[order[i]]] * coef[4]
+  models <- list(ls[[i]], lasso[[i]], ridge[[i]])
+  print(paste('MSE for feature', order[i]))
+  for (model in models) {
+    print(MSE(reg_test$logtargamt, predicted_response(model), nrow(reg_test)))
+  }
+}
+
+# lasso and ridge perform better than least square.
+```
+
+
+```{r}
+compare <- cbind(data.frame(lasso[[3]][1] + lasso[[3]][2]*reg_test$recency + lasso[[3]][3]*reg_test$tof + lasso[[3]][4]*reg_test$amount), reg_test$logtargamt)
+zeros <- compare[compare[[2]]==0, 1]
+ones <- compare[compare[[2]]!=0, 1]
+
+final <- data.frame("predicted"=compare[[1]]*new_logistic_pred, "observed"=test$logtargamt)
+MSE(final[[2]], final[[1]], nrow(final))
+```
+

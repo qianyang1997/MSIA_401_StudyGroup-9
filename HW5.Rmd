@@ -1,0 +1,180 @@
+---
+title: "HW5"
+author: "Qiana Yang"
+date: "10/25/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+7.7
+
+```{r}
+
+
+
+logodds_men <- log(0.445/(1-0.445))
+logodds_women <- log((557/1835)/(1-557/1835))
+
+logodds_men #-0.22
+logodds_women #-0.83
+logodds_men - logodds_women #0.61
+
+# fit regression model based on gender
+
+admissions <- read.csv(here::here("UCBAdmissions.csv"))
+head(admissions)
+
+fit <- glm(Admit~Gender, family=binomial, data=admissions)
+summary(fit)
+# yes
+
+fit2 <- glm(Admit~Gender+Dept.A+Dept.B+Dept.C+Dept.D+Dept.E, family=binomial, data=admissions)
+summary(fit2)
+
+#the coefficient for gender is no longer significant, meaning that when departments are taken into consideration, the difference between two genders is no longer significant. 
+
+#confint 
+```
+7.8
+
+```{r}
+cancer <- data.frame("days"=c(21,24,25,26,28,31,33,34,35,37,43,39,51,55,25,29,43,44,46,46,51,55,56,58), "Response"=c(rep(1,14), rep(0,10)))
+
+
+fit <- glm(Response~days, family=binomial, cancer)
+summary(fit)
+
+exp(-0.09790 * 5 + 5 * 0.04578 * 1.96)
+
+fit$fitted.values
+
+result <- predict(fit,newdata=data.frame("days"=c(27, 28, 29, 30, 31)), type="response")
+pred1 <- rep("No", 5)
+pred1[result > 0.5] <- "Yes"
+pred1
+tab1 <- table(fit$y,fit$fitted.values>0.5)
+CCR <- sum(diag(tab1))/sum(tab1)
+CCR
+
+
+
+anova(fit,update(fit, ~1), test="Chisq")
+
+BestCutoff <- c()
+increment <- 1
+for (i in seq(0,1,0.1)) {
+  tab1 <- table(fit$y,fit$fitted.values>i)
+  CCR <- sum(diag(tab1))/sum(tab1)
+  BestCutoff[increment] <- CCR
+  increment <- increment + 1}
+print(BestCutoff)
+
+table(fit$y,fit$fitted.values>0.6)
+#11/14, 8/10, f1
+```
+
+
+```{r}
+
+exp(0.035)
+exp(0.035 + 1.96*0.0148)
+
+log(1/10) - 0.0906 * 50 - 0.0755 * 180
+
+exp(0.035 - 20.42 + 60 * 0.0906 + 200 * 0.0755)
+p/1-p = 1.16
+1.16/2.16
+
+```
+
+7.10
+```{r}
+CCR1 <- 9000/10000 #0.9
+specificity1 <- 8100/9000 #0.9
+sensitivity1 <- 900/1000 #0.9
+precision1 <- 900/1800 #0.5
+recall1 <- 0.9 #0.9
+F1 <- 1/(0.5*((1/precision1) + (1/recall1))) #0.643
+
+CCR2 <- 9000/10000 #0.9
+specificity2 <- 8100/9900 #0.82
+sensitivity2 <- 90/100 #0.9
+precision2 <- 90/1080 #0.083
+recall2 <- 0.9 #0.9
+F2 <- 1/(0.5*((1/precision2) + (1/recall2))) #0.153
+
+# Both systems have low levels of precision - out of all the documents that the first system deems relevant, half of them are irrelevant. Out of all the documents that the second system deems relevant, more than 90% of them are irrelevant. The systems are performing well when comparing all other measures.
+
+```
+
+```{r}
+
+strsplit(datetime)
+df <- data.frame("temperature"=c(21,24,25,26,28,31,33,34,35,37,43,39,51,55,25,29,43,44,46,46,51,55,56,58), "Response"=seq(ISOdate("2012-02-04"), ISOdate("2014-02-04"), by="year"))
+fit <- lm(Response~temperature, df)
+    for (x in seq(hours + 1, hours + n * 24)) {
+        print(x)
+        predict <- coef(fit)[2] * x + coef(fit)[1]
+        print(predict[[1]])}
+
+24*as.numeric(as.difftime(ISOdate(2014,09,10) + 1 - ISOdate(2014,05,03)))
+
+as.numeric(as.difftime(ISOdate(2014,09,10) + 86400 - ISOdate(2014,05,03)))
+ISOdate(2012,2,12)
+```
+
+```{r}
+
+vector <- c() 
+increment <- 1
+for (x in seq(25,48)) {
+        vector[increment] <- coef(fit)[[2]] * x + coef(fit)[[1]]
+        increment <- increment + 1}
+print(vector)
+
+```
+```{r}
+group <- read.csv(here::here("Art-education group data.csv"))
+head(group)
+
+sensitivity <- c(0)
+one_specificity <- c(0)
+increment <- 2
+sens <- 0
+spec <- 0
+totalYes <- sum(group$Yes)
+totalNo <- sum(group$No)
+for (i in seq(8, 1, -1)) {
+  sens <- sens + group[group$Education==i, "Yes"]/totalYes
+  spec <- spec + group[group$Education==i, "No"]/totalNo
+  sensitivity[increment] <- sens
+  one_specificity[increment] <- spec
+  increment <- increment + 1
+}
+table <- data.frame(sensitivity, one_specificity)
+plot(table$one_specificity, table$sensitivity)
+```
+
+```{r}
+exp(70*(-0.0865) + 3.819)/1.107
+
+exp(-0.0865 + 1.96 * 0.0432)
+exp(-0.0865 - 1.96 * 0.0432)
+exp(-0.865)
+```
+
+```{r}
+log(1/10) - 0.0906 * 50 - 0.0755 * 180
+
+exp(0.0906 * 60 + 0.143 + 190 * 0.0755 -20.42)/1.6089616
+exp(0.0906 * 60 + 0.143 + 190 * 0.0755 -20.42)
+
+2756/(2756 + 3245)
+186/(186+44)
+(2756 + 3245) * (186+44) - 967951 - 385806
+(967951 + 0.5 * 26473)/1380230
+```
+

@@ -1,0 +1,136 @@
+---
+title: "HW6"
+author: "Qiana Yang"
+date: "10/29/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+
+log((38/42)/(14/21))
+
+```
+
+
+7.12(a)
+```{r}
+library(nnet)
+pregnancy <- read.csv(here::here("Pregnancy.csv"))
+head(pregnancy)
+pregnancy$Age = factor(pregnancy$Age)
+pregnancy$Alcohol = factor(pregnancy$Alcohol)
+pregnancy$Smoking = factor(pregnancy$Smoking)
+pregnancy$Age = relevel(pregnancy$Age, 2)
+
+index <- seq(1, nrow(pregnancy), 2)
+train <- pregnancy[index,]
+test <- pregnancy[-index,]
+
+fit1 <- multinom(Duration~., data = train, maxit=3000)
+summary(fit1)
+predicted <- predict(fit1,type='probs',newdata=test[-c(1)])
+
+prediction <- c()
+for (i in seq(1, nrow(test), 1)) {
+  if (predicted[i, "1"] == max(predicted[i,])) {
+    prediction[i] <- 1
+  } else if (predicted[i, "2"] == max(predicted[i,])) {
+    prediction[i] <- 2
+  } else {
+    prediction[i] <- 3
+  }
+}
+
+confMatrix <- table(factor(test$Duration), factor(prediction))
+confMatrix
+sum(diag(confMatrix))/sum(confMatrix)
+# CCR is 56.9%. Out of all observations with Duration=1, we correctly predicted 4/13 = 31% of them. For Duration=2, we correctly predicted 9/17 = 53% of them. For Duration=3, we correctly predicted 16/21=76% of them.
+
+```
+
+```{r}
+
+train2 <- pregnancy[index,]
+test2 <- pregnancy[-index,]
+train2$Duration <- ordered(train2$Duration, levels=c(1,2,3))
+test2$Duration <- ordered(test2$Duration, levels=c(1,2,3))
+
+fit2 <- clm(Duration ~., data = train2)
+summary(fit2)
+
+newPredict = predict(fit2, test2, type="class")$fit
+ctable2 = table(test2$Duration, newPredict)
+ctable2
+sum(diag(ctable2))/sum(ctable2)
+# CCR is 66.7%. Out of all observations with Duration=1, we correctly predicted 5/13 = 38% of them. For Duration=2, we correctly predicted 10/17 = 59% of them. For Duration=3, we correctly predicted 19/21 = 90% of them. Ordinal regression yields better predictions in this case.
+```
+
+
+7.13(a)
+```{r}
+library(nnet)
+library(ordinal)
+mammography <- read.csv(here::here("Mammography.csv"))
+
+# split into test and training sets
+index <- seq(1, nrow(mammography), 2)
+train <- mammography[index,]
+test <- mammography[-index,]
+
+# nominal regression model on training set
+fit1 <- multinom(ME ~ PB + HIST, data = train, maxit=3000)
+predicted <- predict(fit1,type='probs',newdata=test[-c(1,2)])
+
+prediction <- c()
+for (i in seq(1, nrow(test), 1)) {
+  if (predicted[i, "0"] == max(predicted[i,])) {
+    prediction[i] <- 0
+  } else if (predicted[i, "1"] == max(predicted[i,])) {
+    prediction[i] <- 1
+  } else {
+    prediction[i] <- 2
+  }
+}
+
+confMatrix <- table(factor(test$ME), factor(prediction))
+confMatrix
+(113)/sum(confMatrix)
+# Overall correct classification rate is 55%. Out of all observations with ME=0, we correctly predicted 106/110 = 96% of them. For ME=1, we correctly predicted 0% of them. For ME=2, we correctly predicted 7/55 = 13% of them.
+```
+
+7.12(b)
+```{r}
+train2 <- mammography[index,]
+test2 <- mammography[-index,]
+train2$ME <- ordered(train2$ME, levels=c(0,2,1))
+test2$ME <- ordered(test2$ME, levels=c(0,2,1))
+
+fit2 <- clm(ME ~ PB + HIST, data = train2)
+summary(fit2)
+
+newPredict = predict(fit2, test2, type="class")$fit
+ctable2 = table(test2$ME, newPredict);
+sum(diag(ctable2))/sum(ctable2)
+
+# overall accuracy rate is 106/206 = 56%. For ME=0, the accuracy rate is 103/110 = 94%. For ME=2, accuracy rate is 0%. For ME=1, accuracy rate is 3/41 = 7%.
+```
+7.14
+```{r}
+
+program <- read.csv(here::here("program.csv"))
+head(program)
+
+fit <- multinom(factor(prog)~factor(gender)+factor(ses)+factor(schtyp)+read+write+math+science, program, maxit=3000)
+
+# how to find p values?
+(0.75*(1/6))/(0.75*1/6 + 0.25 * 2/13)
+(0.25*1/6)/(0.25*1/6 + 0.75*2/13)
+(1/6)/(1/6 + 2/13)
+
+
+```
+

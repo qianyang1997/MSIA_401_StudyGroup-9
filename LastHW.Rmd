@@ -1,0 +1,92 @@
+---
+title: "LastHW"
+author: "Qiana Yang"
+date: "11/23/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(survival)
+library(tidyr)
+```
+
+10.10
+```{r}
+amrp <- read.csv("C:\\Users\\zelia\\Desktop\\MSiA_401HW\\AMRP.csv")
+
+head(amrp)
+
+# flip censored values
+amrp_new <- amrp
+amrp_new[amrp$censored==1, "censored"] <- 0
+amrp_new[amrp$censored==0, "censored"] <- 1
+```
+
+```{r}
+
+coxfit <- coxph(Surv(t, censored) ~ ., amrp_new)
+summary(coxfit)
+```
+**The strongest predictors are prevcatmerch, prevcattravel, pregas, prebank, preretail, and baselen because they are statistically very significant (p value < 0.01).**
+
+```{r}
+
+recid <- read.csv(here::here("recid.csv"))
+names(recid)
+head(recid)
+
+recid1 <- recid[,1:11]
+recid2 <- recid[,-(2:11)]
+
+#recid_new <- tmerge(recid1, recid2, id=X, na.rm=T, event=event())
+# create empty lists, start and end
+
+# iterate over every person
+for (i in 1:nrow(recid2)) {
+  start <- c(0)
+  end <- c()
+  emp <- c(recid2[i, 2])
+  # iterate over other cells
+  for (j in 3:ncol(recid2)) {
+    if (is.na(recid2[i, j])) {
+      end[length(end) + 1] <- j - 2
+      break
+    }
+    else if (tail(emp, 1) == recid2[i, j]) {
+      if (j < ncol(recid2)) {next}
+      else (end[length(end) + 1] <- j - 1)
+    }
+    else {
+      end[length(end) + 1] <- j - 2
+      start[length(start) + 1] <- j - 2
+      emp[length(emp) + 1] <- recid2[i, j]
+      if (j == ncol(recid2)) {end[length(end) + 1] <- j - 1}
+    }
+  }
+  # create data frame, set person index as same length, etc.
+  new_data <- data.frame(X=rep(i, length(start)), start=start, end=end, emp=emp)
+  # if not first run, append new data frame to old data frame
+  if (i > 1) {
+    new_data <- rbind(old_data, new_data)
+  }
+  # set the joint data frame as old data frame
+  old_data <- new_data
+}
+
+recid_new <- merge(recid1, old_data, by = "X")[-3]
+recid_new$Week <- c(recid_new$Week <= recid_new$end)
+coxfit_new <- coxph(Surv(start, end, Week)~Aid + Age + Race + Work + Married + Parole + Prior + Education + emp, recid_new[,-1])
+summary(coxfit_new)
+summary(step(coxfit_new))
+# only prior and employment are significant in the final stepwise model.
+coxfit_new2 <- coxph(Surv(start, end, Week)~Aid + Prior + Age, recid_new[,-1])
+summary(coxfit_new2)
+summary(step(coxfit_new2))
+# Aid is less significant and therefore removed from the model.
+```
+**When the time dependent covariate employed is included in the model, we see that only employment is significant when all features are considered. If we fit on Aid, Prior, and Age, then only Prior is significant.**
+
